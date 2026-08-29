@@ -1,0 +1,362 @@
+{
+  "variables": [
+    {
+      "id": 1,
+      "key": "idm",
+      "value": "Informasi dari Mitra",
+      "description": "Informasi dari Mitra",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "key": "idi",
+      "value": "Informasi dari Internal",
+      "description": "Informasi dari Internal",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "key": "idb",
+      "value": "Informasi dari Biller",
+      "description": "Informasi dari Biller",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "key": "fvo",
+      "value": "FU ke VSI OPS",
+      "description": "FU ke VSI OPS",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "key": "fms",
+      "value": "FU ke MASA SAC",
+      "description": "FU ke MASA SAC",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 6,
+      "key": "fc",
+      "value": "FU ke Ceria",
+      "description": "FU ke Ceria",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 7,
+      "key": "fb",
+      "value": "Fu ke Biller",
+      "description": "Fu ke Biller",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 8,
+      "key": "mkm",
+      "value": "Menyampaikan ke mitra",
+      "description": "Menyampaikan ke mitra",
+      "createdAt": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "id": 1787054786663,
+      "key": "id",
+      "value": "Informasi dari",
+      "description": "Informasi dari",
+      "createdAt": "2026-08-18T12:06:26.663Z"
+    },
+    {
+      "id": 1787054966651,
+      "key": "fkm",
+      "value": "FU ke Mitra",
+      "description": "FU Mitra",
+      "createdAt": "2026-08-18T12:09:26.651Z"
+    },
+    {
+      "id": 1787137668019,
+      "key": "fmo",
+      "value": "FU ke Masago OPS",
+      "description": "Masago",
+      "createdAt": "2026-08-19T11:07:48.019Z"
+    }
+  ],
+  "saldo_items": [
+    {
+      "id": "pln_jatel",
+      "label": "Saldo PLN - JATEL :",
+      "description": "PLN JATEL"
+    },
+    {
+      "id": "bimasakti_pdam",
+      "label": "Saldo Bimasakti - PDAM  :",
+      "description": "Bimasakti PDAM"
+    },
+    {
+      "id": "teleanjar_pdam",
+      "label": "Saldo Teleanjar - PDAM:",
+      "description": "Teleanjar PDAM"
+    },
+    {
+      "id": "delima_bpjs",
+      "label": "Saldo DELIMA - BPJS-Kes & PayTV :",
+      "description": "DELIMA BPJS-Kes & PayTV"
+    },
+    {
+      "id": "dji_fif",
+      "label": "Saldo DJI - FIF :",
+      "description": "DJI FIF"
+    },
+    {
+      "id": "pluslink_mf",
+      "label": "Saldo Pluslink - MF :",
+      "description": "Pluslink MF"
+    },
+    {
+      "id": "mitracom_pbb",
+      "label": "Saldo Mitracom - PBB :",
+      "description": "Mitracom PBB"
+    },
+    {
+      "id": "gsp",
+      "label": "Saldo GSP :",
+      "description": "GSP"
+    },
+    {
+      "id": "ptpos_pdam",
+      "label": "Saldo PT POS - PDAM :",
+      "description": "PT POS PDAM"
+    },
+    {
+      "id": "artajasa_mba",
+      "label": "Saldo Artajasa - MBA :",
+      "description": "Artajasa MBA"
+    },
+    {
+      "id": "artajasa_vsi",
+      "label": "Saldo Artajasa - VSI :",
+      "description": "Artajasa VSI"
+    },
+    {
+      "id": "arindo_pdam",
+      "label": "Saldo Arindo - PDAM :",
+      "description": "Arindo PDAM"
+    },
+    {
+      "id": "dana_voucher",
+      "label": "Saldo Dana - Voucher :",
+      "description": "Dana Voucher"
+    },
+    {
+      "id": "linkqu_transfer",
+      "label": "Saldo LinkQU - Transfer Uang :",
+      "description": "LinkQU Transfer Uang"
+    },
+    {
+      "id": "ovo",
+      "label": "Saldo Ovo :",
+      "description": "Ovo"
+    },
+    {
+      "id": "tokopedia_gopay",
+      "label": "Saldo Tokopedia - Gopay :",
+      "description": "Tokopedia Gopay"
+    },
+    {
+      "id": "ajn_pdam",
+      "label": "Saldo AJN - PDAM :",
+      "description": "AJN PDAM"
+    }
+  ],
+  "saldo_items_siang_sore": [
+    {
+      "id": "pln_jatel",
+      "label": "Saldo PLN - JATEL :",
+      "description": "PLN JATEL"
+    },
+    {
+      "id": "bimasakti_pdam",
+      "label": "Saldo Bimasakti - PDAM  :",
+      "description": "Bimasakti PDAM"
+    },
+    {
+      "id": "teleanjar_pdam",
+      "label": "Saldo Teleanjar - PDAM:",
+      "description": "Teleanjar PDAM"
+    },
+    {
+      "id": "delima_bpjs",
+      "label": "Saldo DELIMA - BPJS-Kes & PayTV :",
+      "description": "DELIMA BPJS-Kes & PayTV"
+    },
+    {
+      "id": "dji_fif",
+      "label": "Saldo DJI - FIF :",
+      "description": "DJI FIF"
+    },
+    {
+      "id": "pluslink_mf",
+      "label": "Saldo Pluslink - MF :",
+      "description": "Pluslink MF"
+    },
+    {
+      "id": "mitracom_pbb",
+      "label": "Saldo Mitracom - PBB :",
+      "description": "Mitracom PBB"
+    },
+    {
+      "id": "gsp",
+      "label": "Saldo GSP :",
+      "description": "GSP"
+    },
+    {
+      "id": "ptpos_pdam",
+      "label": "Saldo PT POS - PDAM :",
+      "description": "PT POS PDAM"
+    },
+    {
+      "id": "artajasa_mba",
+      "label": "Saldo Artajasa - MBA :",
+      "description": "Artajasa MBA"
+    },
+    {
+      "id": "artajasa_vsi",
+      "label": "Saldo Artajasa - VSI :",
+      "description": "Artajasa VSI"
+    },
+    {
+      "id": "arindo_pdam",
+      "label": "Saldo Arindo - PDAM :",
+      "description": "Arindo PDAM"
+    },
+    {
+      "id": "dana_voucher",
+      "label": "Saldo Dana - Voucher :",
+      "description": "Dana Voucher"
+    },
+    {
+      "id": "linkqu_transfer",
+      "label": "Saldo LinkQU - Transfer Uang :",
+      "description": "LinkQU Transfer Uang"
+    },
+    {
+      "id": "ovo",
+      "label": "Saldo Ovo :",
+      "description": "Ovo"
+    },
+    {
+      "id": "tokopedia_gopay",
+      "label": "Saldo Tokopedia - Gopay :",
+      "description": "Tokopedia Gopay"
+    },
+    {
+      "id": "ajn_pdam",
+      "label": "Saldo AJN - PDAM :",
+      "description": "AJN PDAM"
+    }
+  ],
+  "saldo_items_pagi_malam": [
+    {
+      "id": "pulsa_114",
+      "label": "Saldo Pulsa-114 - Voucher :",
+      "description": "Pulsa-114 Voucher"
+    },
+    {
+      "id": "emoney_voucher",
+      "label": "Saldo E-Money - Voucher :",
+      "description": "E-Money Voucher"
+    },
+    {
+      "id": "mmi_voucher",
+      "label": "Saldo MMI - Voucher :",
+      "description": "MMI Voucher"
+    },
+    {
+      "id": "ppm_voucher",
+      "label": "Saldo PPM - Voucher :",
+      "description": "PPM Voucher"
+    },
+    {
+      "id": "bimasakti_pdam",
+      "label": "Saldo Bimasakti - PDAM  :",
+      "description": "Bimasakti PDAM"
+    },
+    {
+      "id": "teleanjar_pdam",
+      "label": "Saldo Teleanjar - PDAM :",
+      "description": "Teleanjar PDAM"
+    },
+    {
+      "id": "delima_bpjs",
+      "label": "Saldo DELIMA - BPJS-Kes & PayTV :",
+      "description": "DELIMA BPJS-Kes & PayTV"
+    },
+    {
+      "id": "dji_fif",
+      "label": "Saldo DJI - FIF :",
+      "description": "DJI FIF"
+    },
+    {
+      "id": "pluslink_mf",
+      "label": "Saldo Pluslink - MF :",
+      "description": "Pluslink MF"
+    },
+    {
+      "id": "mitracom_pbb",
+      "label": "Saldo Mitracom - PBB :",
+      "description": "Mitracom PBB"
+    },
+    {
+      "id": "gsp",
+      "label": "Saldo GSP :",
+      "description": "GSP"
+    },
+    {
+      "id": "ptpos_pdam",
+      "label": "Saldo PT POS - PDAM :",
+      "description": "PT POS PDAM"
+    },
+    {
+      "id": "artajasa_mba",
+      "label": "Saldo Artajasa - MBA :",
+      "description": "Artajasa MBA"
+    },
+    {
+      "id": "arindo_pdam",
+      "label": "Saldo Arindo - PDAM :",
+      "description": "Arindo PDAM"
+    },
+    {
+      "id": "ewallet_dana",
+      "label": "Saldo Ewallet - Dana :",
+      "description": "E-Wallet Dana"
+    },
+    {
+      "id": "linkqu_transfer",
+      "label": "Saldo LinkQU - Transfer Uang :",
+      "description": "LinkQU Transfer Uang"
+    },
+    {
+      "id": "artajasa_vsi",
+      "label": "Saldo Artajasa - VSI :",
+      "description": "Artajasa VSI"
+    },
+    {
+      "id": "ewallet_ovo",
+      "label": "Saldo Ewallet - Ovo :",
+      "description": "E-Wallet Ovo"
+    },
+    {
+      "id": "tokopedia_gopay",
+      "label": "Saldo Tokopedia - Gopay :",
+      "description": "Tokopedia Gopay"
+    },
+    {
+      "id": "ajn_pdam",
+      "label": "Saldo AJN - PDAM :",
+      "description": "AJN PDAM"
+    },
+    {
+      "id": "pln_jatel",
+      "label": "Saldo PLN - JATEL :",
+      "description": "PLN JATEL"
+    }
+  ]
+}

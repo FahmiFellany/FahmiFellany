@@ -1,0 +1,21 @@
+node_modules/
+*.log
+.env
+.env.*
+
+# SSH Keys & Private Files
+Pearlsuf1231
+Pearlsuf1231.pub
+*.pub
+*.pem
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+*.key
+
+# OS & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
