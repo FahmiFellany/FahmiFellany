@@ -2,6 +2,8 @@ node_modules/
 *.log
 .env
 .env.*
+!.env.example
+
 
 # SSH Keys & Private Files
 Pearlsuf1231
