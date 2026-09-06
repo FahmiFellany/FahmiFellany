@@ -9,7 +9,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '5000',
     agentAdmin: 'AMANAH BERKAH CANDRIKA (ABC) 5000',
     cid: '0170016 | MASAGO - BDI - CV AMANAH BERKAH CANDRIKA )',
-    referal: '0000081336730105',
+    referal: '0000081336730109',
     theme: '82 - AMANAH BERKAH CANDRIKA',
     ea: 'MASAGO_ABC - MASAGO ABC'
   },
@@ -18,7 +18,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '3000',
     agentAdmin: 'AMANAH BERKAH CANDRIKA (ABC) 3000',
     cid: '0170019 | MASAGO - BDI - CV AMANAH BERKAH CANDRIKA 3000)',
-    referal: '0000081336801323',
+    referal: '0000081336891322',
     theme: '82 - AMANAH BERKAH CANDRIKA',
     ea: 'MASAGO_ABC_3000 - MASAGO ABC 3000'
   },
@@ -36,7 +36,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '3000',
     agentAdmin: 'BETTA IKASINDO (BI) 3000',
     cid: '0170030 - MASAGO - BDI - CV BETTA IKASINDO (BI) 3000',
-    referal: '00000812276919189',
+    referal: '0000008122769191',
     theme: '89 - BETTA IKASINDO 3000',
     ea: 'MASAGO_BETTA - MASAGO BETTA IKASINDO 3000'
   },
@@ -54,7 +54,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '3500',
     agentAdmin: 'BETTA IKASINDO (BI) 3500',
     cid: '0170032 - MASAGO - BDI - CV BETTA IKASINDO (BI) 3500',
-    referal: '0000085643724123',
+    referal: '0000085643724121',
     theme: '91 - BETTA IKASINDO 3500',
     ea: 'MASAGO_BETTA_3500 - MASAGO BETTA IKASINDO 3500'
   },
@@ -63,7 +63,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '5000',
     agentAdmin: 'BETTA IKASINDO (BI) 5000',
     cid: '0170033 - MASAGO - BDI - CV BETTA IKASINDO (BI) 5000',
-    referal: '000008252884919192',
+    referal: '0000082328849191',
     theme: '92 - BETTA IKASINDO 5000',
     ea: 'MASAGO_BETTA_5000 - MASAGO BETTA IKASINDO 5000'
   },
@@ -72,7 +72,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '3500 3000 4000',
     agentAdmin: 'BETTA IKASINDO (BI) 3500 3000 4000',
     cid: '0170035 - MASAGO - BDI - CV BETTA IKASINDO (BI) 3500 3000 4000',
-    referal: '00000895327524621',
+    referal: '0000895327524620',
     theme: '93 - BETTA IKASINDO',
     ea: 'MASAGO_BETTA_3500_3000_4000 - MASAGO BETTA IKASINDO 3500 3000 4000'
   },
@@ -81,7 +81,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '5000 3000 5000',
     agentAdmin: 'BETTA IKASINDO (BI) 5000 3000 5000',
     cid: '0170036 - MASAGO - BDI - CV BETTA IKASINDO (BI) 5000 3000 5000',
-    referal: '00000895327524622',
+    referal: '0000895327524622',
     theme: '94 - BETTA IKASINDO',
     ea: 'MASAGO_BETTA_5000_3000_5000 - MASAGO BETTA IKASINDO 5000 3000 5000'
   },
@@ -90,7 +90,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '4000 4000 4000',
     agentAdmin: 'BETTA IKASINDO (BI) 4000 4000 4000',
     cid: '0170037 - MASAGO - BDI - CV BETTA IKASINDO (BI) 4000 4000 4000',
-    referal: '00000895327524623',
+    referal: '0000895327524623',
     theme: '95 - BETTA IKASINDO',
     ea: 'MASAGO_BETTA_4000 - MASAGO BETTA IKASINDO 4000 4000 4000'
   },
@@ -117,7 +117,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '2750',
     agentAdmin: 'Dian Malindo Utama (DMU) 2750',
     cid: '0170028 - MASAGO - BDI - CV Dian Malindo Utama (DMU) 2750',
-    referal: '0000089563125544',
+    referal: '0000895631255445',
     theme: '86 - DIAN MALINDO UTAMA DMU - 2750',
     ea: 'MASAGO_DIAN_MALINDO_UTAMA_2750 - MASAGO DIAN MALINDO UTAMA 2750'
   },
@@ -135,7 +135,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '3000',
     agentAdmin: 'MITRA SEJAHTERA 3000',
     cid: '0170039 - MASAGO - BDI - CV MITRA SEJAHTERA (3000) 3000 3000',
-    referal: '000008112902725',
+    referal: '0000008112902727',
     theme: '96 - CV MITRA SEJAHTERA 3000',
     ea: 'MASAGO_MITRA_SEJAHTERA_3000_3000_3000 - MASAGO MITRA SEJAHTERA 3000 3000 3000'
   },
@@ -144,7 +144,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '2750',
     agentAdmin: 'MITRA SEJAHTERA 2750',
     cid: '0170040 - MASAGO - BDI - CV MITRA SEJAHTERA (2750) 2750 2750',
-    referal: '000008161111633',
+    referal: '0000008161111633',
     theme: '97 - CV MITRA SEJAHTERA 2750',
     ea: 'MASAGO_MITRA_SEJAHTERA_2750_2750_2750 - MASAGO MITRA SEJAHTERA 2750 2750 2750'
   },
@@ -153,7 +153,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '2500',
     agentAdmin: 'MITRA SEJAHTERA 2500',
     cid: '0170041 - MASAGO - BDI - CV MITRA SEJAHTERA (2500) 2500 2500',
-    referal: '000008197896996',
+    referal: '0000008197896994',
     theme: '98 - CV MITRA SEJAHTERA 2500',
     ea: 'MASAGO_MITRA_SEJAHTERA_2500_2500_2500 - MASAGO MITRA SEJAHTERA 2500 2500 2500'
   },
@@ -189,7 +189,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '2250',
     agentAdmin: 'ENTRI-NRY 2250',
     cid: '0170044 - MASAGO - BDI - ENTRI-NRY (2250)',
-    referal: '0000081333588803',
+    referal: '0000081333588893',
     theme: '102 - ENTRI-NRY 2250',
     ea: 'MASAGO_ENTRI_NRY_2250_2250_2250'
   },
@@ -207,7 +207,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '2750',
     agentAdmin: 'ENTRI-NRY 2750',
     cid: '0170046 - MASAGO - BDI - ENTRI-NRY (2750)',
-    referal: '0000081223855581',
+    referal: '0000081223855583',
     theme: '104 - ENTRI-NRY 2750',
     ea: 'MASAGO_ENTRI_NRY_2750_2750_2750'
   },
@@ -216,7 +216,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '3000',
     agentAdmin: 'ENTRI-NRY 3000',
     cid: '0170047 - MASAGO - BDI - ENTRI-NRY (3000)',
-    referal: '000008777794041',
+    referal: '0000087777794042',
     theme: '105 - ENTRI-NRY 3000',
     ea: 'MASAGO_ENTRI_NRY_3000_3000_3000'
   },
@@ -225,7 +225,7 @@ export const MASTER_CID_EKS_DATA = [
     admin: '3250',
     agentAdmin: 'ENTRI-NRY 3250',
     cid: '0170048 - MASAGO - BDI - ENTRI-NRY (3250)',
-    referal: '00000812222556654',
+    referal: '0000081222556654',
     theme: '106 - ENTRI-NRY 3250',
     ea: 'MASAGO_ENTRI_NRY_3250_3250_3250'
   },
@@ -280,21 +280,34 @@ export class CidEksModel {
   }
 
   /**
+   * Format PPID menjadi 16 digit dengan angka 0 di depan
+   */
+  formatPpid(ppidInput) {
+    if (!ppidInput) return '';
+    const clean = String(ppidInput).trim();
+    if (!clean) return '';
+    const digits = clean.replace(/\D/g, '');
+    const targetDigits = digits || clean;
+    return targetDigits.padStart(16, '0');
+  }
+
+  /**
    * Proses pencarian perbandingan CID Lama & Baru
    */
-  compareCidEks(agentName, adminLama, adminBaru) {
+  compareCidEks(agentName, adminLama, adminBaru, ppidVal = '') {
     const rowLama = this.findRow(agentName, adminLama);
     const rowBaru = this.findRow(agentName, adminBaru);
 
     const isLamaValid = !!rowLama;
     const isBaruValid = !!rowBaru;
 
-    const formattedOutput = this.formatAllDataOutput(rowLama, rowBaru);
+    const formattedOutput = this.formatAllDataOutput(rowLama, rowBaru, ppidVal);
 
     return {
       agentName,
       adminLama,
       adminBaru,
+      ppidVal,
       rowLama,
       rowBaru,
       isLamaValid,
@@ -307,7 +320,10 @@ export class CidEksModel {
   /**
    * Format teks ALL DATA (Output Merah)
    */
-  formatAllDataOutput(rowLama, rowBaru) {
+  formatAllDataOutput(rowLama, rowBaru, ppidVal = '') {
+    const formattedPpid = this.formatPpid(ppidVal);
+    const ppidLine = formattedPpid ? `PPID        : ${formattedPpid}` : `PPID        : -`;
+
     const cidLama = rowLama ? rowLama.cid : '(Data Admin Lama Tidak Ditemukan)';
     const refLama = rowLama ? rowLama.referal : '-';
     const themeLama = rowLama ? rowLama.theme : '-';
@@ -319,6 +335,7 @@ export class CidEksModel {
     const eaBaru = rowBaru ? rowBaru.ea : '-';
 
     return [
+      ppidLine,
       `CID Lama    : ${cidLama}`,
       `Referal Lama: ${refLama}`,
       `Theme Lama  : ${themeLama}`,

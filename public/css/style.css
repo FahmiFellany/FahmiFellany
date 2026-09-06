@@ -2821,7 +2821,8 @@ body.modal-open {
   margin-bottom: 0.4rem;
 }
 
-.cid-select.green {
+.cid-select.green,
+.cid-input.green {
   width: 100%;
   padding: 0.65rem 0.85rem;
   border-radius: 8px;
@@ -2834,7 +2835,8 @@ body.modal-open {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.cid-select.green:focus {
+.cid-select.green:focus,
+.cid-input.green:focus {
   border-color: #10b981;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
 }

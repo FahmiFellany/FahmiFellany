@@ -15,29 +15,35 @@ export class CidEksController {
     const agentList = this.model.getUniqueAgents();
     this.view.populateAgentOptions(agentList);
 
-    // 2. Pilih default Agent (BETTA IKASINDO (BI) atau agent pertama)
+    // 2. Tampilkan pilihan PPID default
+    const ppidList = ['082216130101'];
+    this.view.populatePpidOptions(ppidList);
+
+    // 3. Pilih default Agent (BETTA IKASINDO (BI) atau agent pertama)
     const defaultAgent = agentList.includes('BETTA IKASINDO (BI)') ? 'BETTA IKASINDO (BI)' : (agentList[0] || '');
     if (this.view.selectAgent) {
       this.view.selectAgent.value = defaultAgent;
     }
 
-    // 3. Update daftar Admin berdasarkan Agent terpilih
+    // 4. Update daftar Admin berdasarkan Agent terpilih
     this.updateAdminDropdowns(defaultAgent);
 
-    // 4. Set Nilai Default Contoh (Admin Lama: 4000 4000 4000, Admin Baru: 5000) jika tersedia
+    // 5. Set Nilai Default Contoh (PPID: 082216130101, Admin Lama: 4000 4000 4000, Admin Baru: 5000)
+    this.view.setPpidValue('082216130101');
     this.view.setAdminLamaValue('4000 4000 4000');
     this.view.setAdminBaruValue('5000');
 
-    // 5. Hubungkan Event Listener
+    // 6. Hubungkan Event Listener
     this.view.bindAgentChange((selectedAgent) => {
       this.updateAdminDropdowns(selectedAgent);
       this.onInputChange();
     });
 
+    this.view.bindPpidChange(() => this.onInputChange());
     this.view.bindAdminLamaChange(() => this.onInputChange());
     this.view.bindAdminBaruChange(() => this.onInputChange());
 
-    // 6. Jalankan pencarian pertama kali
+    // 7. Jalankan pencarian pertama kali
     this.onInputChange();
   }
 
@@ -49,10 +55,11 @@ export class CidEksController {
 
   onInputChange() {
     const agentName = this.view.getSelectedAgent();
+    const ppidVal = this.view.getPpid();
     const adminLama = this.view.getAdminLama();
     const adminBaru = this.view.getAdminBaru();
 
-    const compareResult = this.model.compareCidEks(agentName, adminLama, adminBaru);
+    const compareResult = this.model.compareCidEks(agentName, adminLama, adminBaru, ppidVal);
     this.view.renderResult(compareResult);
   }
 }

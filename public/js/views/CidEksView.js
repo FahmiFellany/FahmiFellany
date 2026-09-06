@@ -9,6 +9,8 @@
 export class CidEksView {
   constructor() {
     this.selectAgent = document.getElementById('cidSelectAgent');
+    this.selectPpid = document.getElementById('cidSelectPpid');
+    this.inputPpid = document.getElementById('cidInputPpid');
     this.selectAdminLama = document.getElementById('cidSelectAdminLama');
     this.inputAdminLama = document.getElementById('cidInputAdminLama');
     this.selectAdminBaru = document.getElementById('cidSelectAdminBaru');
@@ -81,6 +83,49 @@ export class CidEksView {
       opt.textContent = agent;
       this.selectAgent.appendChild(opt);
     });
+  }
+
+  populatePpidOptions(ppidList) {
+    if (!this.selectPpid) return;
+    const currentVal = this.selectPpid.value;
+    this.selectPpid.innerHTML = '<option value="">-- Pilih / Ketik PPID --</option>';
+    ppidList.forEach(ppid => {
+      const opt = document.createElement('option');
+      opt.value = ppid;
+      opt.textContent = ppid;
+      this.selectPpid.appendChild(opt);
+    });
+    if (currentVal && ppidList.includes(currentVal)) {
+      this.selectPpid.value = currentVal;
+    }
+  }
+
+  bindPpidChange(handler) {
+    if (this.selectPpid) {
+      this.selectPpid.addEventListener('change', () => {
+        if (this.inputPpid) {
+          this.inputPpid.value = this.selectPpid.value;
+        }
+        handler();
+      });
+    }
+    if (this.inputPpid) {
+      this.inputPpid.addEventListener('input', () => {
+        if (this.selectPpid) {
+          this.selectPpid.value = this.inputPpid.value;
+        }
+        handler();
+      });
+    }
+  }
+
+  getPpid() {
+    return (this.inputPpid ? this.inputPpid.value : '') || (this.selectPpid ? this.selectPpid.value : '');
+  }
+
+  setPpidValue(val) {
+    if (this.inputPpid) this.inputPpid.value = val;
+    if (this.selectPpid) this.selectPpid.value = val;
   }
 
   populateAdminLamaOptions(adminList) {
