@@ -17,6 +17,7 @@ export class CidEksView {
     this.outputContainer = document.getElementById('cidAllDataOutput');
     this.warningBanner = document.getElementById('cidWarningBanner');
     this.btnCopyOutput = document.getElementById('cidBtnCopyOutput');
+    this.btnClear = document.getElementById('cidBtnClear');
     this.toast = document.getElementById('toast');
 
     // Navigation Tabs
@@ -50,6 +51,31 @@ export class CidEksView {
         if (item.view) item.view.style.display = 'none';
       }
     });
+  }
+
+  bindClear(handler) {
+    if (this.btnClear) {
+      this.btnClear.addEventListener('click', handler);
+    }
+  }
+
+  bindNavTabLeave(handler) {
+    [this.navTabConverter, this.navTabOcr, this.navTabSaldo].forEach(tab => {
+      if (tab) {
+        tab.addEventListener('click', () => {
+          if (handler) handler();
+        });
+      }
+    });
+  }
+
+  resetForm() {
+    if (this.selectAgent) this.selectAgent.value = '';
+    if (this.inputPpid) this.inputPpid.value = '';
+    if (this.selectAdminLama) this.selectAdminLama.value = '';
+    if (this.inputAdminLama) this.inputAdminLama.value = '';
+    if (this.selectAdminBaru) this.selectAdminBaru.value = '';
+    if (this.inputAdminBaru) this.inputAdminBaru.value = '';
   }
 
   initEvents() {

@@ -36,7 +36,17 @@ export class CidEksController {
     this.view.bindAdminLamaChange(() => this.onInputChange());
     this.view.bindAdminBaruChange(() => this.onInputChange());
 
-    // 5. Jalankan pemicu tampilan awal (Guard Clause)
+    // 5. Hubungkan Tombol Bersihkan & Auto-Reset saat Berpindah Menu Tab
+    this.view.bindClear(() => this.clearForm());
+    this.view.bindNavTabLeave(() => this.clearForm());
+
+    // 6. Jalankan pemicu tampilan awal (Guard Clause)
+    this.onInputChange();
+  }
+
+  clearForm() {
+    this.view.resetForm();
+    this.updateAdminDropdowns('');
     this.onInputChange();
   }
 
