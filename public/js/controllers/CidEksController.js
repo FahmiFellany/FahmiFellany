@@ -11,25 +11,22 @@ export class CidEksController {
   }
 
   init() {
-    // 1. Dapatkan semua agent unik & tampilkan di dropdown Green
+    // 1. Dapatkan semua agent unik & tampilkan di dropdown Green (Default Kosong "")
     const agentList = this.model.getUniqueAgents();
     this.view.populateAgentOptions(agentList);
-
-    // 2. Pilih default Agent (BETTA IKASINDO (BI) atau agent pertama)
-    const defaultAgent = agentList.includes('BETTA IKASINDO (BI)') ? 'BETTA IKASINDO (BI)' : (agentList[0] || '');
     if (this.view.selectAgent) {
-      this.view.selectAgent.value = defaultAgent;
+      this.view.selectAgent.value = '';
     }
 
-    // 4. Update daftar Admin berdasarkan Agent terpilih
-    this.updateAdminDropdowns(defaultAgent);
+    // 2. Inisialisasi daftar Admin (Default Kosong "")
+    this.updateAdminDropdowns('');
 
-    // 5. Set Nilai Default Contoh (PPID: 082216130101, Admin Lama: 4000 4000 4000, Admin Baru: 5000)
-    this.view.setPpidValue('082216130101');
-    this.view.setAdminLamaValue('4000 4000 4000');
-    this.view.setAdminBaruValue('5000');
+    // 3. Pastikan semua field input bertipe default kosong ""
+    this.view.setPpidValue('');
+    this.view.setAdminLamaValue('');
+    this.view.setAdminBaruValue('');
 
-    // 6. Hubungkan Event Listener
+    // 4. Hubungkan Event Listener
     this.view.bindAgentChange((selectedAgent) => {
       this.updateAdminDropdowns(selectedAgent);
       this.onInputChange();
@@ -39,7 +36,7 @@ export class CidEksController {
     this.view.bindAdminLamaChange(() => this.onInputChange());
     this.view.bindAdminBaruChange(() => this.onInputChange());
 
-    // 7. Jalankan pencarian pertama kali
+    // 5. Jalankan pemicu tampilan awal (Guard Clause)
     this.onInputChange();
   }
 

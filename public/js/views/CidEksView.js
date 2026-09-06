@@ -75,13 +75,19 @@ export class CidEksView {
 
   populateAgentOptions(agentList) {
     if (!this.selectAgent) return;
-    this.selectAgent.innerHTML = '';
+    const currentVal = this.selectAgent.value;
+    this.selectAgent.innerHTML = '<option value="">-- Pilih Nama Agent --</option>';
     agentList.forEach(agent => {
       const opt = document.createElement('option');
       opt.value = agent;
       opt.textContent = agent;
       this.selectAgent.appendChild(opt);
     });
+    if (currentVal && agentList.includes(currentVal)) {
+      this.selectAgent.value = currentVal;
+    } else {
+      this.selectAgent.value = '';
+    }
   }
 
   bindPpidChange(handler) {
