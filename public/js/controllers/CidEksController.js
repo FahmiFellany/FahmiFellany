@@ -15,11 +15,7 @@ export class CidEksController {
     const agentList = this.model.getUniqueAgents();
     this.view.populateAgentOptions(agentList);
 
-    // 2. Tampilkan pilihan PPID default
-    const ppidList = ['082216130101'];
-    this.view.populatePpidOptions(ppidList);
-
-    // 3. Pilih default Agent (BETTA IKASINDO (BI) atau agent pertama)
+    // 2. Pilih default Agent (BETTA IKASINDO (BI) atau agent pertama)
     const defaultAgent = agentList.includes('BETTA IKASINDO (BI)') ? 'BETTA IKASINDO (BI)' : (agentList[0] || '');
     if (this.view.selectAgent) {
       this.view.selectAgent.value = defaultAgent;
