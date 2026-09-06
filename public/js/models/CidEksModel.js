@@ -269,20 +269,17 @@ export class CidEksModel {
    */
   /**
    * Cari baris data berdasarkan Nama Agent & Admin
-   * Jika adminVal kosong, mengembalikan baris pertama yang cocok untuk agentName tersebut.
+   * Membutuhkan Nama Agent dan Admin. Jika Admin belum dipilih/diisi, mengembalikan null.
    */
   findRow(agentName, adminVal) {
-    if (!agentName || !agentName.trim()) return null;
+    if (!agentName || !agentName.trim() || !adminVal || !adminVal.trim()) return null;
     const cleanAgent = agentName.trim().toLowerCase();
-    const cleanAdmin = adminVal ? adminVal.trim().toLowerCase() : '';
+    const cleanAdmin = adminVal.trim().toLowerCase();
 
     return this.masterData.find(item => {
       const matchAgent = item.agent.trim().toLowerCase() === cleanAgent;
-      if (!matchAgent) return false;
-      if (cleanAdmin) {
-        return item.admin.trim().toLowerCase() === cleanAdmin;
-      }
-      return true;
+      const matchAdmin = item.admin.trim().toLowerCase() === cleanAdmin;
+      return matchAgent && matchAdmin;
     }) || null;
   }
 
@@ -335,22 +332,6 @@ export class CidEksModel {
   formatAllDataOutput(rowLama, rowBaru, ppidVal = '', agentName = '', adminLama = '', adminBaru = '') {
     const formattedPpid = this.formatPpid(ppidVal);
     const ppidLine = `PPID        : ${formattedPpid || '-'}`;
-
-    // Guard clause: Jika Agent belum dipilih sama sekali, tampilkan semua "-"
-    if (!agentName) {
-      return [
-        ppidLine,
-        `CID Lama    : -`,
-        `Referal Lama: -`,
-        `Theme Lama  : -`,
-        `EA Lama     : -`,
-        ``,
-        `CID Baru    : -`,
-        `Referal Baru: -`,
-        `Theme Baru  : -`,
-        `EA Baru     : -`
-      ].join('\n');
-    }
 
     const cidLama = rowLama ? rowLama.cid : (adminLama ? '(Data Admin Lama Tidak Ditemukan)' : '-');
     const refLama = rowLama ? rowLama.referal : '-';
