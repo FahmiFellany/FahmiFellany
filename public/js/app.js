@@ -14,6 +14,10 @@ import { SaldoModel } from './models/SaldoModel.js';
 import { SaldoView } from './views/SaldoView.js';
 import { SaldoController } from './controllers/SaldoController.js';
 
+import { CidEksModel } from './models/CidEksModel.js';
+import { CidEksView } from './views/CidEksView.js';
+import { CidEksController } from './controllers/CidEksController.js';
+
 /**
  * Main Application Bootstrap (OOP MVC)
  */
@@ -46,9 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const saldoView = new SaldoView();
   const saldoController = new SaldoController(saldoModel, saldoView);
 
-  // 5. Hubungkan Controller Lintas Menu (Cross-Menu Navigation)
+  // 5. Inisialisasi CID EKS Search & Comparison Component
+  const cidEksModel = new CidEksModel();
+  const cidEksView = new CidEksView();
+  const cidEksController = new CidEksController(cidEksModel, cidEksView);
+
+  // 6. Hubungkan Controller Lintas Menu (Cross-Menu Navigation)
   converterController.setCrossMenuControllers({
     ocrController,
-    saldoController
+    saldoController,
+    cidEksController
   });
 });

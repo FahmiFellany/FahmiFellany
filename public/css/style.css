@@ -2755,3 +2755,245 @@ body.modal-open {
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
 }
+
+/* ==========================================================================
+   CID EKS VIEW STYLING (Green Agent, Blue Admin, Red ALL DATA Output)
+   ========================================================================== */
+.cid-header {
+  margin-bottom: 1.5rem;
+}
+
+.cid-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .cid-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cid-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Green Theme - Nama Agent */
+.cid-card-header.green {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.cid-card-icon.green {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cid-card-title.green {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #10b981;
+  margin: 0;
+}
+
+.cid-label.green {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #34d399;
+  margin-bottom: 0.4rem;
+}
+
+.cid-select.green {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #ecfdf5;
+  font-size: 0.92rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cid-select.green:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.cid-select.green option {
+  background: #064e3b;
+  color: #ffffff;
+}
+
+/* Blue Theme - Admin Lama & Admin Baru */
+.cid-card-header.blue {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.cid-card-icon.blue {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cid-card-title.blue {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin: 0;
+}
+
+.cid-label.blue {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #60a5fa;
+  margin-bottom: 0.3rem;
+}
+
+.cid-select.blue,
+.cid-input.blue {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #eff6ff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cid-select.blue:focus,
+.cid-input.blue:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.cid-select.blue option {
+  background: #1e3a8a;
+  color: #ffffff;
+}
+
+/* Red Theme - ALL DATA Output */
+.cid-output-card.red {
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, rgba(15, 23, 42, 0.6) 100%);
+  margin-bottom: 1.5rem;
+}
+
+.cid-card-header.red {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid rgba(239, 68, 68, 0.35);
+}
+
+.cid-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cid-card-icon.red {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cid-card-title.red {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin: 0;
+}
+
+.btn-copy-output.red {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-copy-output.red:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.45);
+}
+
+.cid-output-textarea.red {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-family: 'JetBrains Mono', Consolas, monospace !important;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 1rem;
+  resize: vertical;
+  outline: none;
+}
+
+.cid-output-textarea.red:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* Warning Banner */
+.cid-warning-banner {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}

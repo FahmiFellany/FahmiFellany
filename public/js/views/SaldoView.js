@@ -52,11 +52,13 @@ export class SaldoView {
     this.navTabOcr = document.getElementById('navTabOcr');
     this.navTabExcel = document.getElementById('navTabExcel');
     this.navTabSaldo = document.getElementById('navTabSaldo');
+    this.navTabCidEks = document.getElementById('navTabCidEks');
 
     this.viewConverter = document.getElementById('viewConverter');
     this.viewOcr = document.getElementById('viewOcr');
     this.viewExcel = document.getElementById('viewExcel');
     this.viewSaldo = document.getElementById('viewSaldo');
+    this.viewCidEks = document.getElementById('viewCidEks');
 
     this.toast = document.getElementById('toast');
     this.toastTimer = null;
@@ -441,7 +443,8 @@ export class SaldoView {
     const tabs = [
       { name: 'converter', tab: this.navTabConverter, view: this.viewConverter, display: 'flex' },
       { name: 'ocr', tab: this.navTabOcr, view: this.viewOcr, display: 'block' },
-      { name: 'saldo', tab: this.navTabSaldo, view: this.viewSaldo, display: 'block' }
+      { name: 'saldo', tab: this.navTabSaldo, view: this.viewSaldo, display: 'block' },
+      { name: 'cidEks', tab: this.navTabCidEks, view: this.viewCidEks, display: 'block' }
     ];
 
     tabs.forEach(item => {
