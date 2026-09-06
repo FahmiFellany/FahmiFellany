@@ -300,7 +300,7 @@ export class ExcelConverterModel {
     }));
 
     rawList = rawList.filter(item => String(item.id) !== String(id));
-    
+
     // Auto-reindex huruf kolom (A, B, C...) jika diinginkan
     rawList = rawList.map((item, index) => ({
       ...item,
@@ -430,7 +430,7 @@ export class ExcelConverterModel {
       // Header Text (Otomatis dari teks input jika terdeteksi, atau default konfigurasi)
       const cleanH = data ? data.cleanHeader : colDef.cleanHeader;
       const rawH = data ? data.header : colDef.header;
-      
+
       let headerText = '';
       if (headerFormat === 'clean') {
         headerText = cleanH;
@@ -466,7 +466,7 @@ export class ExcelConverterModel {
 
     // TSV (Tab Separated Values) -> Sempurna untuk Copy & Paste langsung ke Microsoft Excel
     const tsv = `${row1Headers.join('\t')}\n${row2Values.join('\t')}`;
-    
+
     // Nilai baris 2 saja (TSV)
     const tsvRow2Only = row2Values.join('\t');
 
@@ -524,7 +524,7 @@ Rp. 30.448.200
 Rp. 54.460.334
 
 *Saldo E-Money - Voucher:*
-Rp. 4.440.043
+Rp. 14.361.843
 
 *Saldo Ewallet - Dana:*
 Rp. 3.007.055.010

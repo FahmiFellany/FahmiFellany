@@ -49,7 +49,7 @@ export const DEFAULT_SALDO_ITEMS_PAGI_MALAM = [
 
 export const DEFAULT_PRESET_PAGI_MALAM = {
   'pulsa_114': '1.127.884',
-  'emoney_voucher': '4.440.043',
+  'emoney_voucher': '14.361.843',
   'ppm_voucher': '30.448.200',
   'arindo_pdam': '58.785.913',
   'linkqu_transfer': '6.391.065'
