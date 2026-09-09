@@ -6,6 +6,8 @@
 .env.development.local
 .env.test.local
 .env.production.local
+
+# PENGECUALIAN: .env.example TETAP DILACAK (Jangan di-gitignore)
 !.env.example
 
 # SSH & SSL Keys
@@ -31,7 +33,6 @@ data/*.db-journal
 # File JSON Data Operasional Runtime
 data/database.json
 data/*.json
-!data/.gitkeep
 
 # ==========================================
 # 3. Dependencies & Package Managers
@@ -75,3 +76,9 @@ coverage/
 scratch/
 temp/
 tmp/
+
+# ==========================================
+# 6. Global Pengecualian .gitkeep & .env.example
+# ==========================================
+# PENGECUALIAN GLOBAL: File .gitkeep di folder mana pun TETAP DILACAK untuk menjaga struktur folder kosong di Git
+!.gitkeep
