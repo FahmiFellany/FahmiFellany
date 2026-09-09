@@ -19,6 +19,7 @@ export class ConverterView {
     this.timezoneOffset = document.getElementById('timezoneOffset');
     this.wrapperStyle = document.getElementById('wrapperStyle');
     this.autoConvert = document.getElementById('autoConvert');
+    this.autoCleanDuplicates = document.getElementById('autoCleanDuplicates');
     this.matchBadge = document.getElementById('matchBadge');
     this.toast = document.getElementById('toast');
     this.toastTimer = null;
@@ -86,6 +87,10 @@ export class ConverterView {
     return this.autoConvert ? this.autoConvert.checked : true;
   }
 
+  isAutoCleanDuplicatesChecked() {
+    return this.autoCleanDuplicates ? this.autoCleanDuplicates.checked : true;
+  }
+
   isAutoClearOnCopyChecked() {
     return this.autoClearOnCopy ? this.autoClearOnCopy.checked : false;
   }
@@ -100,19 +105,25 @@ export class ConverterView {
   }
 
   /**
-   * Update Badge Status Tanggal Terkonversi
+   * Update Badge Status Tanggal Terkonversi & Pembersihan Chat
    * @param {number} count
+   * @param {number} cleanedDupCount
    */
-  updateMatchBadge(count = 0) {
+  updateMatchBadge(count = 0, cleanedDupCount = 0) {
     if (this.matchBadge) {
-      this.matchBadge.textContent = `${count} tanggal dikonversi`;
+      let badgeText = `${count} tanggal dikonversi`;
+      if (cleanedDupCount > 0) {
+        badgeText += ` • ✨ ${cleanedDupCount} duplikat dibersihkan`;
+      }
+      this.matchBadge.textContent = badgeText;
       this.matchBadge.className = 'match-count-badge';
     }
   }
 
   updateAiBadge(info = {}) {
     const count = typeof info === 'number' ? info : (info.count || 0);
-    this.updateMatchBadge(count);
+    const cleanedDupCount = typeof info === 'object' ? (info.cleanedDupCount || 0) : 0;
+    this.updateMatchBadge(count, cleanedDupCount);
   }
 
   hideWarningBanner() {
@@ -307,6 +318,7 @@ export class ConverterView {
   bindOptionChange(handler) {
     if (this.timezoneOffset) this.timezoneOffset.addEventListener('change', handler);
     if (this.wrapperStyle) this.wrapperStyle.addEventListener('change', handler);
+    if (this.autoCleanDuplicates) this.autoCleanDuplicates.addEventListener('change', handler);
   }
 
   bindVariableChips(handler) {

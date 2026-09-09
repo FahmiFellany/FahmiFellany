@@ -1,52 +1,30 @@
-const fs = require('fs');
-const path = require('path');
+const dbInstance = require('../config/Database');
 
 const DEFAULT_VARIABLES = [
-  { id: 1, key: 'idm', value: 'Informasi dari Mitra', description: 'Informasi dari Mitra', createdAt: new Date().toISOString() },
-  { id: 2, key: 'idi', value: 'Informasi dari Internal', description: 'Informasi dari Internal', createdAt: new Date().toISOString() },
-  { id: 3, key: 'idb', value: 'Informasi dari Biller', description: 'Informasi dari Biller', createdAt: new Date().toISOString() },
-  { id: 4, key: 'fvo', value: 'FU ke VSI OPS', description: 'FU ke VSI OPS', createdAt: new Date().toISOString() },
-  { id: 5, key: 'fms', value: 'FU ke MASA SAC', description: 'FU ke MASA SAC', createdAt: new Date().toISOString() },
-  { id: 6, key: 'fc', value: 'FU ke Ceria', description: 'FU ke Ceria', createdAt: new Date().toISOString() },
-  { id: 7, key: 'fb', value: 'Fu ke Biller', description: 'Fu ke Biller', createdAt: new Date().toISOString() },
-  { id: 8, key: 'mkm', value: 'Menyampaikan ke mitra', description: 'Menyampaikan ke mitra', createdAt: new Date().toISOString() }
+  { key: 'idm', value: 'Informasi dari Mitra', description: 'Informasi dari Mitra' },
+  { key: 'idi', value: 'Informasi dari Internal', description: 'Informasi dari Internal' },
+  { key: 'idb', value: 'Informasi dari Biller', description: 'Informasi dari Biller' },
+  { key: 'fvo', value: 'FU ke VSI OPS', description: 'FU ke VSI OPS' },
+  { key: 'fms', value: 'FU ke MASA SAC', description: 'FU ke MASA SAC' },
+  { key: 'fc', value: 'FU ke Ceria', description: 'FU ke Ceria' },
+  { key: 'fb', value: 'Fu ke Biller', description: 'Fu ke Biller' },
+  { key: 'mkm', value: 'Menyampaikan ke mitra', description: 'Menyampaikan ke mitra' }
 ];
 
 /**
  * VariableModel
- * Model backend OOP untuk mengelola CRUD Variabel Cepat dengan validasi constraint unique key.
+ * Model backend OOP untuk mengelola CRUD Variabel Cepat dengan database SQLite.
  */
 class VariableModel {
-  constructor(dbPath) {
-    this.dbPath = dbPath || path.join(__dirname, '../../data/database.json');
+  constructor() {
+    this.db = dbInstance.getConnection();
     this._ensureVariablesExist();
   }
 
-  _readAll() {
-    try {
-      if (!fs.existsSync(this.dbPath)) return { internal: [], mitra: [], biller: [], variables: [...DEFAULT_VARIABLES] };
-      const content = fs.readFileSync(this.dbPath, 'utf-8');
-      const parsed = JSON.parse(content || '{}');
-      if (!Array.isArray(parsed.variables) || parsed.variables.length === 0) {
-        parsed.variables = [...DEFAULT_VARIABLES];
-        fs.writeFileSync(this.dbPath, JSON.stringify(parsed, null, 2), 'utf-8');
-      }
-      return parsed;
-    } catch (err) {
-      console.error('Error reading variables from database:', err);
-      return { variables: [...DEFAULT_VARIABLES] };
-    }
-  }
-
-  _saveAll(data) {
-    fs.writeFileSync(this.dbPath, JSON.stringify(data, null, 2), 'utf-8');
-  }
-
   _ensureVariablesExist() {
-    const db = this._readAll();
-    if (!Array.isArray(db.variables) || db.variables.length === 0) {
-      db.variables = [...DEFAULT_VARIABLES];
-      this._saveAll(db);
+    const count = this.db.prepare('SELECT COUNT(*) AS count FROM variables').get().count;
+    if (count === 0) {
+      this.resetDefaults();
     }
   }
 
@@ -56,8 +34,8 @@ class VariableModel {
   }
 
   getAll() {
-    const db = this._readAll();
-    return Array.isArray(db.variables) ? db.variables : [];
+    const stmt = this.db.prepare('SELECT * FROM variables ORDER BY id ASC');
+    return stmt.all();
   }
 
   getMap() {
@@ -80,84 +58,102 @@ class VariableModel {
       throw new Error('Nama variabel (kunci) dan nilai teks output wajib diisi');
     }
 
-    const db = this._readAll();
-    const variables = Array.isArray(db.variables) ? db.variables : [];
-
-    const existing = variables.find(v => v.key.toLowerCase() === cleanKey);
+    const existing = this.db.prepare('SELECT * FROM variables WHERE LOWER(key) = ?').get(cleanKey);
     if (existing) {
       throw new Error(`Variabel "${cleanKey}" sudah ada! Kunci variabel harus unik.`);
     }
 
-    const newItem = {
-      id: Date.now(),
+    const createdAt = new Date().toISOString();
+    const stmt = this.db.prepare(`
+      INSERT INTO variables (key, value, description, createdAt)
+      VALUES (?, ?, ?, ?)
+    `);
+
+    const info = stmt.run(cleanKey, cleanValue, cleanDesc, createdAt);
+    return {
+      id: info.lastInsertRowid,
       key: cleanKey,
       value: cleanValue,
       description: cleanDesc,
-      createdAt: new Date().toISOString()
+      createdAt
     };
-
-    variables.push(newItem);
-    db.variables = variables;
-    this._saveAll(db);
-    return newItem;
   }
 
   update(id, { key, value, description }) {
-    const db = this._readAll();
-    const variables = Array.isArray(db.variables) ? db.variables : [];
-
-    const idx = variables.findIndex(v => v.id == id);
-    if (idx === -1) {
+    const existing = this.db.prepare('SELECT * FROM variables WHERE id = ?').get(id);
+    if (!existing) {
       throw new Error(`Variabel dengan ID ${id} tidak ditemukan`);
     }
+
+    let newKey = existing.key;
+    let newValue = existing.value;
+    let newDesc = existing.description;
 
     if (key !== undefined) {
       const cleanKey = this._cleanText(key).toLowerCase().replace(/\s+/g, '');
       if (!cleanKey) throw new Error('Nama variabel tidak boleh kosong');
 
-      const dup = variables.find(v => v.id != id && v.key.toLowerCase() === cleanKey);
+      const dup = this.db.prepare('SELECT * FROM variables WHERE id != ? AND LOWER(key) = ?').get(id, cleanKey);
       if (dup) {
         throw new Error(`Variabel "${cleanKey}" sudah digunakan! Kunci variabel harus unik.`);
       }
-      variables[idx].key = cleanKey;
+      newKey = cleanKey;
     }
 
     if (value !== undefined) {
       const cleanValue = this._cleanText(value);
       if (!cleanValue) throw new Error('Nilai teks output tidak boleh kosong');
-      variables[idx].value = cleanValue;
+      newValue = cleanValue;
     }
 
     if (description !== undefined) {
-      variables[idx].description = this._cleanText(description);
+      newDesc = this._cleanText(description);
     }
 
-    variables[idx].updatedAt = new Date().toISOString();
-    db.variables = variables;
-    this._saveAll(db);
-    return variables[idx];
+    const updatedAt = new Date().toISOString();
+    const stmt = this.db.prepare(`
+      UPDATE variables
+      SET key = ?, value = ?, description = ?, updatedAt = ?
+      WHERE id = ?
+    `);
+
+    stmt.run(newKey, newValue, newDesc, updatedAt, id);
+    return {
+      ...existing,
+      key: newKey,
+      value: newValue,
+      description: newDesc,
+      updatedAt
+    };
   }
 
   delete(id) {
-    const db = this._readAll();
-    const variables = Array.isArray(db.variables) ? db.variables : [];
-
-    const idx = variables.findIndex(v => v.id == id);
-    if (idx === -1) {
+    const existing = this.db.prepare('SELECT * FROM variables WHERE id = ?').get(id);
+    if (!existing) {
       throw new Error(`Variabel dengan ID ${id} tidak ditemukan`);
     }
 
-    variables.splice(idx, 1);
-    db.variables = variables;
-    this._saveAll(db);
+    const stmt = this.db.prepare('DELETE FROM variables WHERE id = ?');
+    stmt.run(id);
     return true;
   }
 
   resetDefaults() {
-    const db = this._readAll();
-    db.variables = [...DEFAULT_VARIABLES];
-    this._saveAll(db);
-    return db.variables;
+    const resetTx = this.db.transaction(() => {
+      this.db.prepare('DELETE FROM variables').run();
+      const insertStmt = this.db.prepare(`
+        INSERT INTO variables (key, value, description, createdAt)
+        VALUES (?, ?, ?, ?)
+      `);
+
+      const now = new Date().toISOString();
+      DEFAULT_VARIABLES.forEach(v => {
+        insertStmt.run(v.key, v.value, v.description, now);
+      });
+    });
+
+    resetTx();
+    return this.getAll();
   }
 }
 

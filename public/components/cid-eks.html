@@ -1,0 +1,111 @@
+<!-- VIEW 5: CID EKS SEARCH & COMPARISON -->
+<div id="viewCidEks" class="view-container" style="display: none;">
+  <div class="cid-header">
+    <div class="cid-header-title-group">
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem;">Pencarian &
+        Perbandingan CID EKS</h2>
+      <p class="section-desc" style="font-size: 0.82rem; color: #94a3b8; margin: 0;">Pilih Agent, Admin Lama, dan
+        Admin Baru untuk mendapatkan perbandingan detail CID, Referal, Theme, dan EA.</p>
+    </div>
+    <button type="button" id="cidBtnClear" class="btn-clear-cid" title="Bersihkan Form CID EKS">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+      <span>Bersihkan</span>
+    </button>
+  </div>
+
+  <!-- Main Input Grid -->
+  <div class="cid-grid">
+    <!-- Card 1: Nama Agent (HIJAU / GREEN) -->
+    <div class="cid-card cid-agent-card">
+      <div class="cid-card-header green">
+        <div class="cid-card-icon green">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <h3 class="cid-card-title green">Nama Agent</h3>
+      </div>
+      <div class="cid-card-body">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="cidSelectAgent" class="cid-label green">Pilih Nama Agent</label>
+          <select id="cidSelectAgent" class="cid-select green">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <!-- PPID Input Manual -->
+        <div class="form-group">
+          <label for="cidInputPpid" class="cid-label green">PPID (Input Manual)</label>
+          <input type="text" id="cidInputPpid" class="cid-input green"
+            placeholder="Ketik PPID (misal: 082216130101)..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Admin Lama & Admin Baru (BIRU / BLUE) -->
+    <div class="cid-card cid-admin-card">
+      <div class="cid-card-header blue">
+        <div class="cid-card-icon blue">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <polyline points="17 11 19 13 23 9"></polyline>
+          </svg>
+        </div>
+        <h3 class="cid-card-title blue">Admin Lama & Admin Baru</h3>
+      </div>
+      <div class="cid-card-body cid-admin-inputs">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="cidSelectAdminLama" class="cid-label blue">Admin Lama</label>
+          <select id="cidSelectAdminLama" class="cid-select blue" style="margin-bottom: 0.4rem;">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="cidSelectAdminBaru" class="cid-label blue">Admin Baru</label>
+          <select id="cidSelectAdminBaru" class="cid-select blue" style="margin-bottom: 0.4rem;">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Warning Banner jika data admin tidak valid / tidak ditemukan -->
+  <div id="cidWarningBanner" class="cid-warning-banner" style="display: none;"></div>
+
+  <!-- ALL DATA OUTPUT (MERAH / RED) -->
+  <div class="cid-card cid-output-card red">
+    <div class="cid-card-header red">
+      <div class="cid-card-header-left">
+        <div class="cid-card-icon red">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <h3 class="cid-card-title red">ALL DATA (Keluaran Detail Pencarian)</h3>
+      </div>
+      <button type="button" id="cidBtnCopyOutput" class="btn-copy-output red" title="Salin Seluruh Output">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <span>Salin ALL DATA</span>
+      </button>
+    </div>
+    <div class="cid-card-body">
+      <textarea id="cidAllDataOutput" class="cid-output-textarea red" readonly rows="11"
+        placeholder="Hasil ALL DATA akan tampil otomatis di sini..."></textarea>
+    </div>
+  </div>
+</div>

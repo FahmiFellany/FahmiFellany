@@ -1,0 +1,122 @@
+<!-- MODAL POPUP: Database & Manajemen Variabel Cepat (CRUD) -->
+<div id="variableCrudModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7V4h16v3" />
+            <path d="M9 20h6" />
+            <path d="M12 4v16" />
+          </svg>
+        </div>
+        <div>
+          <h2>Database & Manajemen Variabel Cepat</h2>
+          <p class="modal-subtitle">Tambah, edit, atau hapus kata kunci variabel pintasan untuk konversi otomatis</p>
+        </div>
+      </div>
+      <div class="modal-header-actions">
+        <button type="button" id="btnResetVar" class="btn-ghost-sm" title="Kembalikan ke 8 Variabel Default">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10" />
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+          </svg>
+          Reset Default
+        </button>
+        <button type="button" id="btnCloseVarModal" class="btn-close-modal" title="Tutup Modal (Esc)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="entity-grid">
+        <!-- Form Input / Edit Variabel -->
+        <form id="varForm" class="entity-form">
+          <input type="hidden" id="varId">
+          <div class="form-row">
+            <div class="form-group-item">
+              <label for="varKey">Nama Variabel / Kunci (Ketik di Input):</label>
+              <input type="text" id="varKey" placeholder="Contoh: idm, fvo, mkm" required autocomplete="off">
+            </div>
+            <div class="form-group-item">
+              <label for="varVal">Teks Hasil Output (Konversi):</label>
+              <input type="text" id="varVal" placeholder="Contoh: Informasi dari Mitra" required autocomplete="off">
+            </div>
+          </div>
+          <div class="form-group-item">
+            <label for="varDesc">Keterangan / Catatan (Opsional):</label>
+            <input type="text" id="varDesc" placeholder="Deskripsi atau catatan fungsi variabel...">
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="btnSaveVar" class="btn-primary">Tambah Variabel</button>
+            <button type="button" id="btnCancelVar" class="btn-secondary" style="display: none;">Batal Edit</button>
+          </div>
+        </form>
+
+        <!-- Tabel Variabel & Filter Search -->
+        <div class="entity-list-panel">
+          <div class="var-table-toolbar">
+            <div class="search-box">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="varSearchInput" placeholder="Cari nama variabel atau teks hasil...">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="entity-table">
+              <thead>
+                <tr>
+                  <th style="width: 25%;">Nama Variabel</th>
+                  <th style="width: 40%;">Teks Output (Konversi)</th>
+                  <th style="width: 20%;">Keterangan</th>
+                  <th style="width: 15%; text-align: center;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="varTableBody">
+                <!-- Diisi via JS -->
+              </tbody>
+            </table>
+            <div id="varEmptyMsg" class="empty-msg" style="display: none;">Belum ada data variabel yang cocok.</div>
+          </div>
+
+          <!-- Footer Controls -->
+          <div class="entity-footer">
+            <div class="entries-control">
+              <label for="varEntriesLimit">Show:</label>
+              <select id="varEntriesLimit" class="custom-select select-sm">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="all" selected>Semua</option>
+              </select>
+              <span>entries</span>
+            </div>
+            <span class="entries-info" id="varEntriesInfo">Menampilkan 8 variabel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" id="btnFooterCloseVarModal" class="btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>

@@ -215,13 +215,14 @@ export class ConverterController {
     this.model.setInputText(rawInput);
     this.model.setHourOffset(this.view.getTimezoneOffset());
     this.model.setWrapperStyle(this.view.getWrapperStyle());
+    this.model.setAutoCleanDuplicates(this.view.isAutoCleanDuplicatesChecked());
 
     // Eksekusi Konversi via Model
-    const { resultText, matchCount } = this.model.convert();
+    const { resultText, matchCount, cleanedDupCount } = this.model.convert();
 
     // Render ulang UI Output & Badge
     this.view.setOutputText(resultText);
-    this.view.updateMatchBadge(matchCount);
+    this.view.updateMatchBadge(matchCount, cleanedDupCount);
 
     // Render Smart Suggestions berdasarkan konteks
     if (hasInput) {

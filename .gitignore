@@ -1,13 +1,14 @@
-# Dependencies & Logs
-node_modules/
-*.log
-
-# Environment Files
+# ==========================================
+# 1. Environment & Secret Files (Keamanan)
+# ==========================================
 .env
-.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 !.env.example
 
-# SSH Keys & Private Files
+# SSH & SSL Keys
 id_*
 *.pub
 *.pem
@@ -17,14 +18,60 @@ id_ed25519
 id_ed25519.*
 *.key
 
-# OS & IDE Files
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+# ==========================================
+# 2. Database & Data Storage (Sensitif)
+# ==========================================
+# Data SQLite & File Log WAL
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm
+data/*.db
+data/*.db-journal
 
-# Package Manager Debug Logs
+# File JSON Data Operasional Runtime
+data/database.json
+data/*.json
+!data/.gitkeep
+
+# ==========================================
+# 3. Dependencies & Package Managers
+# ==========================================
+node_modules/
+.pnpm-store/
+
+# Logs
+*.log
+logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# ==========================================
+# 4. OS & IDE System Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE Configs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# 5. Temporary & Build Artifacts
+# ==========================================
+dist/
+build/
+coverage/
+scratch/
+temp/
+tmp/

@@ -1,0 +1,153 @@
+<!-- VIEW 3: UPDATE INFO SALDO (PAGI, SIANG, SORE, MALAM) -->
+<div id="viewSaldo" class="view-container" style="display: none;">
+  <main class="saldo-grid">
+    <!-- Left Panel: Form Input Info Saldo (Compact Grid) -->
+    <section class="card saldo-input-card-panel">
+      <div class="card-header saldo-panel-header">
+        <!-- Periode Toggle Pill (Pagi / Siang / Sore / Malam) & Controls -->
+        <div class="saldo-controls-header">
+          <div class="period-toggle-group">
+            <button type="button" id="saldoBtnPagi" class="period-pill">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+              Pagi
+            </button>
+            <button type="button" id="saldoBtnSiang" class="period-pill active">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              Siang
+            </button>
+            <button type="button" id="saldoBtnSore" class="period-pill">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 18a5 5 0 0 0-10 0"></path>
+                <line x1="12" y1="2" x2="12" y2="9"></line>
+                <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line>
+                <line x1="1" y1="18" x2="3" y2="18"></line>
+                <line x1="21" y1="18" x2="23" y2="18"></line>
+                <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line>
+                <line x1="23" y1="22" x2="1" y2="22"></line>
+              </svg>
+              Sore
+            </button>
+            <button type="button" id="saldoBtnMalam" class="period-pill">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+              Malam
+            </button>
+          </div>
+
+          <div class="saldo-header-right-actions">
+            <button type="button" id="btnOpenSaldoCrudModal" class="btn-manage-vars">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+              Kelola Item
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Multi-Column Form Inputs List -->
+      <div class="saldo-inputs-grid" id="saldoInputsContainer">
+        <!-- Diisi otomatis oleh SaldoView (17 / 21 item) -->
+      </div>
+
+      <div class="action-bar saldo-action-bar">
+        <button type="button" id="saldoBtnClear" class="btn-secondary btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+          Bersihkan Form
+        </button>
+      </div>
+    </section>
+
+    <!-- Right Panel: Live Output Preview & Integrated Summary -->
+    <section class="card saldo-output-card">
+      <div class="card-header">
+        <div class="header-title-group">
+          <div class="header-icon-circle accent-indigo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </div>
+          <div>
+            <h2>Format Teks Saldo</h2>
+          </div>
+        </div>
+        <span id="saldoBadgePeriod" class="saldo-badge siang">Siang</span>
+      </div>
+
+      <div class="form-group saldo-textarea-wrapper">
+        <textarea id="saldoOutputText" readonly placeholder="Format pesan broadcast siap disalin..."
+          spellcheck="false"></textarea>
+      </div>
+
+      <!-- Terintegrasi: Inline Ringkasan Status Saldo Ribbon -->
+      <div id="saldoSummarySection" class="saldo-summary-inline-ribbon">
+        <div class="saldo-summary-stats">
+          <span class="stat-badge stat-filled">Terisi: <strong id="saldoStatFilled">0</strong></span>
+          <span class="stat-badge stat-empty">Kosong: <strong id="saldoStatEmpty">0</strong></span>
+          <span class="stat-badge stat-total">Total (<span id="saldoSummaryCount">0</span>): <strong
+              id="saldoStatTotal">Rp. 0</strong></span>
+        </div>
+        <!-- Hidden container to preserve JS reference if needed -->
+        <div id="saldoSummaryCards" style="display: none;"></div>
+      </div>
+
+      <div class="output-actions saldo-output-actions">
+        <button type="button" id="saldoBtnCopy" class="btn-success">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          Salin Format Pesan
+        </button>
+        <button type="button" id="saldoBtnCopyExcel" class="btn-success btn-excel-green">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          📋 Salin Excel (Baris 2)
+        </button>
+        <button type="button" id="saldoBtnExportExcel" class="btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Unduh Excel (.xlsx)
+        </button>
+      </div>
+    </section>
+  </main>
+</div>

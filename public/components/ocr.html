@@ -1,0 +1,88 @@
+<!-- VIEW 2: IMAGE TO TEXT OCR & TRANSACTION EXTRACTOR -->
+<div id="viewOcr" class="view-container" style="display: none;">
+  <main class="ocr-grid">
+    <!-- Left Panel: Image Dropzone & Raw Text -->
+    <section class="card ocr-input-card">
+      <div class="card-header">
+        <h2>Pengecekan Transaksi</h2>
+      </div>
+
+      <!-- Category Selector Dropdown -->
+      <div class="category-selector-panel">
+        <div class="category-header-row">
+          <label for="ocrCategorySelect" class="input-label">Pilih Jenis Transaksi :</label>
+          <span id="ocrAutoBadge" class="auto-detected-badge" style="display: none;">
+            ✨ Auto Terdeteksi: <strong id="ocrAutoBadgeText">Prepaid</strong>
+          </span>
+        </div>
+        <select id="ocrCategorySelect" class="custom-select category-select">
+          <option value="auto" selected>✨ Otomatis Deteksi (Auto Detect)</option>
+          <option value="fif">FIF / Multi Finance</option>
+          <option value="prepaid">Prepaid (PLN Token Listrik)</option>
+          <option value="postpaid">Postpaid (PLN Tagihan Listrik)</option>
+          <option value="dana">DANA</option>
+          <option value="ovo">OVO</option>
+          <option value="pdam">PDAM</option>
+          <option value="pgn">General Payment</option>
+          <option value="pbb">PBB</option>
+          <option value="bpjs">BPJS</option>
+          <option value="jastel">JASTEL</option>
+          <option value="transfer_uang">Transfer Uang</option>
+        </select>
+      </div>
+
+      <!-- Raw OCR Text Input (Form Salin Teks Perpanjang Kebawah) -->
+      <div class="form-group margin-top">
+        <label for="ocrRawText" class="input-label">Salin Teks:</label>
+        <textarea id="ocrRawText" rows="17" spellcheck="false"
+          placeholder="Masukkan atau tempel teks parameter transaksi di sini... Teks akan diekstrak secara otomatis."></textarea>
+      </div>
+
+      <div class="action-bar">
+        <button type="button" id="ocrBtnExtract" class="btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 3 21 3 21 8" />
+            <line x1="4" y1="20" x2="21" y2="3" />
+          </svg>
+          Ekstrak 11 Data Field
+        </button>
+        <button type="button" id="ocrBtnClear" class="btn-secondary">
+          Bersihkan Form
+        </button>
+      </div>
+    </section>
+
+    <!-- Right Panel: Output Format & Field Summary Cards -->
+    <section class="card ocr-output-card">
+      <div class="card-header">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
+          Konversi Transaksi
+        </h2>
+        <span class="match-count-badge" id="ocrBadge">0 field terdeteksi</span>
+      </div>
+
+      <div class="form-group">
+        <textarea id="ocrFormattedText" readonly placeholder=" " rows="14" spellcheck="false"></textarea>
+      </div>
+
+      <div class="output-actions">
+        <button type="button" id="ocrBtnCopy" class="btn-success">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          Salin Hasil
+        </button>
+      </div>
+    </section>
+  </main>
+</div>

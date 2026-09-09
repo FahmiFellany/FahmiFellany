@@ -1,3 +1,5 @@
+import { ComponentLoader } from './utils/ComponentLoader.js';
+
 import { ConverterModel } from './models/ConverterModel.js';
 import { ConverterView } from './views/ConverterView.js';
 import { ConverterController } from './controllers/ConverterController.js';
@@ -19,9 +21,12 @@ import { CidEksView } from './views/CidEksView.js';
 import { CidEksController } from './controllers/CidEksController.js';
 
 /**
- * Main Application Bootstrap (OOP MVC)
+ * Main Application Bootstrap (OOP MVC Modular)
  */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // 0. Memuat seluruh komponen HTML partials terpisah secara dinamis
+  await ComponentLoader.loadAll();
+
   // 1. Inisialisasi Converter Component
   const converterModel = new ConverterModel();
   const converterView = new ConverterView();

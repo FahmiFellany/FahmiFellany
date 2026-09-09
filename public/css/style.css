@@ -1390,6 +1390,7 @@ body.modal-open {
   letter-spacing: 0.02em;
   white-space: pre;
   tab-size: 4;
+  min-height: 400px;
 }
 
 /* Preview Header Left & Chips */

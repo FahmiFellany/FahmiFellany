@@ -56,6 +56,10 @@ export class ConverterModel {
     this.autoConvert = Boolean(enabled);
   }
 
+  setAutoCleanDuplicates(enabled) {
+    this.autoCleanDuplicates = Boolean(enabled);
+  }
+
   setVariables(variables) {
     if (variables && typeof variables === 'object') {
       this.variables = { ...variables };
@@ -244,16 +248,116 @@ export class ConverterModel {
   }
 
   /**
+   * Pembersihan Teks Chat Duplikat/Berulang (Multi-Line, Sender Header & History Line Skipping)
+   * Memecah teks ke dalam blok pesan chat berdasarkan pola timestamp & pengirim pesan,
+   * lalu menghapus baris-baris kuotasi yang sudah pernah muncul pada blok-blok pesan sebelumnya.
+   * Jika suatu blok pesan 100% berisi kuotasi/duplikat (kosong setelah dibersihkan), blok tersebut tidak ditampilkan.
+   * @param {string} inputText Teks mentah dari input textarea
+   * @returns {{ cleanedText: string, cleanedDupCount: number }} Teks yang sudah dibersihkan dan jumlah duplikasi terdeteksi
+   */
+  cleanDuplicateChatText(inputText) {
+    if (!inputText || typeof inputText !== 'string' || !inputText.trim()) {
+      return { cleanedText: inputText, cleanedDupCount: 0 };
+    }
+
+    // Regex untuk mencocokkan header timestamp + opsional nama pengirim pesan chat (mendukung : maupun - pengirim)
+    // Contoh: "[2:21 PM, 9/7/2026] IT DCO-VSI Baru: " atau "9/8/2026, 09.45 - Nama:" atau "[09.33, 8/9/2026] +62 858-9158-7045: "
+    const timestampHeaderRegex = /(?:(?:\d+[\.\)]\s*)?(?:\[\s*[^\]]+\s*\]|\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}\s+\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?|\d{1,2}[\.:]\d{1,2}\s+\d{1,2}[\/\-\.][A-Za-z]{3}[\/\-\.]\d{4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}T\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?Z?)(?:\s*[^:\n]+:|\s*-\s+[^:\n]+:?)?)/gi;
+
+    // Cari semua lokasi header timestamp dalam teks
+    const matches = [...inputText.matchAll(timestampHeaderRegex)];
+
+    // Jika tidak ada header timestamp yang cocok, kembalikan teks asli
+    if (matches.length === 0) {
+      return { cleanedText: inputText, cleanedDupCount: 0 };
+    }
+
+    // Ekstrak blok-blok pesan chat (Header + Isi Pesan)
+    const blocks = [];
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      const headerStr = match[0];
+      const startIndex = match.index;
+      const headerEndIndex = startIndex + headerStr.length;
+      const nextStartIndex = (i + 1 < matches.length) ? matches[i + 1].index : inputText.length;
+      const bodyStr = inputText.slice(headerEndIndex, nextStartIndex);
+
+      blocks.push({
+        header: headerStr,
+        body: bodyStr
+      });
+    }
+
+    // Set untuk menyimpan baris-baris pesan yang sudah pernah muncul pada blok sebelumnya
+    const seenPreviousLines = new Set();
+    const cleanedBlocks = [];
+    let dupCount = 0;
+
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      let body = block.body;
+
+      // 1. Hapus duplikasi frase berulang dalam body blok itu sendiri
+      let prevTemp;
+      do {
+        prevTemp = body;
+        body = body.replace(/(\b.+?\b)\s+\1(?=\s+|$)/gi, '$1');
+      } while (body !== prevTemp);
+
+      const bodyLines = body.split(/\r?\n/);
+      const cleanedBodyLines = [];
+
+      // 2. Filter baris-baris kuotasi terduplikat
+      for (let j = 0; j < bodyLines.length; j++) {
+        const rawLine = bodyLines[j];
+        const trimmedLine = rawLine.trim();
+
+        // Jika baris ini sudah pernah muncul pada pesan sebelumnya, lewati
+        if (trimmedLine && seenPreviousLines.has(trimmedLine)) {
+          dupCount++;
+          continue;
+        }
+
+        cleanedBodyLines.push(rawLine);
+      }
+
+      // Simpan baris-baris dari blok ini ke Set untuk perbandingan blok berikutnya
+      bodyLines.forEach(line => {
+        const tr = line.trim();
+        if (tr) seenPreviousLines.add(tr);
+      });
+
+      let cleanedBody = cleanedBodyLines.join('\n').trim();
+
+      // 3. 💡 JIKA BLOK PESAN 100% BERISI KUOTASI TERDUPLIKAT (KOSONG SETELAH DIBERSIHKAN), SANGKUTAN TIDAK DITAMPILKAN
+      if (!cleanedBody) {
+        dupCount++;
+        continue;
+      }
+
+      const header = block.header;
+      const formattedHeader = (header.endsWith(' ') || header.endsWith('\n')) ? header : header + ' ';
+      cleanedBlocks.push(formattedHeader + cleanedBody);
+    }
+
+    // Ambil teks jika ada awalan sebelum header pertama
+    const prefixText = inputText.slice(0, matches[0].index).trim();
+    const cleanedText = (prefixText ? prefixText + '\n' : '') + cleanedBlocks.join('\n');
+    return { cleanedText, cleanedDupCount: dupCount };
+  }
+
+  /**
    * Melakukan proses konversi HANYA pada tanggal & jam berformat kurung [ ... ],
    * variabel shortcut, dan penambahan inkremen +1 detik otomatis.
    * Teks tanggal bebas di dalam pesan tiket tidak di-auto-detect/diubah sembarangan.
-   * @returns {{ resultText: string, matchCount: number }}
+   * @returns {{ resultText: string, matchCount: number, cleanedDupCount: number }}
    */
   convert() {
     if (!this.inputText.trim()) {
       this.resultText = '';
       this.matchCount = 0;
-      return { resultText: '', matchCount: 0 };
+      this.cleanedDupCount = 0;
+      return { resultText: '', matchCount: 0, cleanedDupCount: 0 };
     }
 
     let count = 0;
@@ -271,7 +375,16 @@ export class ConverterModel {
       }
     };
 
+    // 0. Pembersihan teks chat terduplikat/berulang di awal baris pesan sebelum konversi
     let text = this.inputText;
+    let cleanedDupCount = 0;
+
+    if (this.autoCleanDuplicates) {
+      const cleanRes = this.cleanDuplicateChatText(this.inputText);
+      text = cleanRes.cleanedText;
+      cleanedDupCount = cleanRes.cleanedDupCount;
+    }
+    this.cleanedDupCount = cleanedDupCount;
 
     // 1. Format Kurung Waktu-Pertama: [17.13, 19/8/2026], [8:25 PM, 8/11/2026], [21:48:15, 11-08-2026]
     text = text.replace(this.patternTimeFirst, (match, hh, mm, ss, ampm, part1, part2, year) => {
@@ -323,7 +436,8 @@ export class ConverterModel {
 
     return {
       resultText: text,
-      matchCount: count
+      matchCount: count,
+      cleanedDupCount: cleanedDupCount
     };
   }
 }

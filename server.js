@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const { exec } = require('child_process');
 
+const MigrateJsonToSqlite = require('./src/utils/MigrateJsonToSqlite');
 const DateTimeConverterModel = require('./src/models/DateTimeConverterModel');
 const VariableModel = require('./src/models/VariableModel');
 const SaldoItemModel = require('./src/models/SaldoItemModel');
@@ -24,6 +25,9 @@ class ServerApp {
     this.app = express();
     this.port = process.env.PORT || port;
     this.host = process.env.HOST || host;
+
+    // 0. Jalankan Auto-Migrasi dari database.json ke SQLite database.sqlite (jika ada)
+    MigrateJsonToSqlite.runMigration();
 
     // Inisialisasi Models & Controllers
     this.variableModel = new VariableModel();
@@ -135,7 +139,7 @@ class ServerApp {
   }
 
   start() {
-    this.app.listen(this.port, this.host, () => {
+    const serverInstance = this.app.listen(this.port, this.host, () => {
       const localUrl = `http://localhost:${this.port}`;
       const networkIP = this._getLocalIP();
       const networkUrl = `http://${networkIP}:${this.port}`;
@@ -150,6 +154,15 @@ class ServerApp {
       console.log(`==================================================`);
 
       this._openBrowser(localUrl);
+    });
+
+    serverInstance.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.warn(`\n⚠️  Port ${this.port} sudah digunakan oleh server yang sedang berjalan!`);
+        console.warn(`👉 Aplikasi Anda sudah AKTIF dan bisa diakses langsung di: http://localhost:${this.port}\n`);
+      } else {
+        console.error('Server error:', err);
+      }
     });
   }
 }

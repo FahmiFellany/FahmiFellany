@@ -1,5 +1,4 @@
-const fs = require('fs');
-const path = require('path');
+const dbInstance = require('../config/Database');
 
 const DEFAULT_SALDO_ITEMS_SIANG_SORE = [
   { id: 'pln_jatel', label: 'Saldo PLN - JATEL :', description: 'PLN JATEL' },
@@ -47,59 +46,20 @@ const DEFAULT_SALDO_ITEMS_PAGI_MALAM = [
 
 /**
  * SaldoItemModel
- * Model backend OOP untuk mengelola CRUD Item/Kategori Saldo Biller per Grup (Siang-Sore & Pagi-Malam).
+ * Model backend OOP untuk mengelola CRUD Item Saldo Biller dengan database SQLite.
  */
 class SaldoItemModel {
-  constructor(dbPath) {
-    this.dbPath = dbPath || path.join(__dirname, '../../data/database.json');
+  constructor() {
+    this.db = dbInstance.getConnection();
     this._ensureItemsExist();
   }
 
-  _readAll() {
-    try {
-      if (!fs.existsSync(this.dbPath)) {
-        return {
-          variables: [],
-          saldo_items_siang_sore: [...DEFAULT_SALDO_ITEMS_SIANG_SORE],
-          saldo_items_pagi_malam: [...DEFAULT_SALDO_ITEMS_PAGI_MALAM]
-        };
-      }
-      const content = fs.readFileSync(this.dbPath, 'utf-8');
-      const parsed = JSON.parse(content || '{}');
-      let changed = false;
-
-      if (!Array.isArray(parsed.saldo_items_siang_sore) || parsed.saldo_items_siang_sore.length === 0) {
-        // Fallback backward compat if old saldo_items existed
-        parsed.saldo_items_siang_sore = Array.isArray(parsed.saldo_items) && parsed.saldo_items.length === 17
-          ? parsed.saldo_items
-          : [...DEFAULT_SALDO_ITEMS_SIANG_SORE];
-        changed = true;
-      }
-
-      if (!Array.isArray(parsed.saldo_items_pagi_malam) || parsed.saldo_items_pagi_malam.length === 0) {
-        parsed.saldo_items_pagi_malam = [...DEFAULT_SALDO_ITEMS_PAGI_MALAM];
-        changed = true;
-      }
-
-      if (changed) {
-        fs.writeFileSync(this.dbPath, JSON.stringify(parsed, null, 2), 'utf-8');
-      }
-      return parsed;
-    } catch (err) {
-      console.error('Error reading saldo_items from database:', err);
-      return {
-        saldo_items_siang_sore: [...DEFAULT_SALDO_ITEMS_SIANG_SORE],
-        saldo_items_pagi_malam: [...DEFAULT_SALDO_ITEMS_PAGI_MALAM]
-      };
-    }
-  }
-
-  _saveAll(data) {
-    fs.writeFileSync(this.dbPath, JSON.stringify(data, null, 2), 'utf-8');
-  }
-
   _ensureItemsExist() {
-    this._readAll();
+    const count = this.db.prepare('SELECT COUNT(*) AS count FROM saldo_items').get().count;
+    if (count === 0) {
+      this.resetDefaults('siang_sore');
+      this.resetDefaults('pagi_malam');
+    }
   }
 
   _cleanText(str) {
@@ -107,11 +67,11 @@ class SaldoItemModel {
     return str.replace(/<[^>]*>?/gm, '').trim();
   }
 
-  _getGroupKey(group) {
+  _getGroupType(group) {
     if (group === 'pagi_malam' || group === 'pagi' || group === 'malam') {
-      return 'saldo_items_pagi_malam';
+      return 'pagi_malam';
     }
-    return 'saldo_items_siang_sore';
+    return 'siang_sore';
   }
 
   _generateId(label) {
@@ -124,9 +84,14 @@ class SaldoItemModel {
   }
 
   getAll(group = 'siang_sore') {
-    const db = this._readAll();
-    const key = this._getGroupKey(group);
-    return Array.isArray(db[key]) ? db[key] : [];
+    const groupType = this._getGroupType(group);
+    const stmt = this.db.prepare(`
+      SELECT id, label, description, createdAt, updatedAt
+      FROM saldo_items
+      WHERE group_type = ?
+      ORDER BY sort_order ASC, rowid ASC
+    `);
+    return stmt.all(groupType);
   }
 
   create({ label, description, group = 'siang_sore' }) {
@@ -137,109 +102,124 @@ class SaldoItemModel {
       throw new Error('Label / Nama Saldo wajib diisi');
     }
 
-    const db = this._readAll();
-    const key = this._getGroupKey(group);
-    const items = Array.isArray(db[key]) ? db[key] : [];
-
+    const groupType = this._getGroupType(group);
     let baseId = this._generateId(cleanLabel);
     let finalId = baseId;
     let counter = 1;
-    while (items.some(i => i.id === finalId)) {
+
+    while (this.db.prepare('SELECT id FROM saldo_items WHERE id = ? AND group_type = ?').get(finalId, groupType)) {
       finalId = `${baseId}_${counter++}`;
     }
 
-    const newItem = {
+    const maxSort = this.db.prepare('SELECT MAX(sort_order) AS max_sort FROM saldo_items WHERE group_type = ?').get(groupType);
+    const nextSort = (maxSort && maxSort.max_sort !== null) ? maxSort.max_sort + 1 : 1;
+    const createdAt = new Date().toISOString();
+
+    const stmt = this.db.prepare(`
+      INSERT INTO saldo_items (id, label, description, group_type, sort_order, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+
+    stmt.run(finalId, cleanLabel, cleanDesc, groupType, nextSort, createdAt);
+    return {
       id: finalId,
       label: cleanLabel,
       description: cleanDesc,
-      createdAt: new Date().toISOString()
+      createdAt
     };
-
-    items.push(newItem);
-    db[key] = items;
-    this._saveAll(db);
-    return newItem;
   }
 
   update(id, { label, description, group = 'siang_sore' }) {
-    const db = this._readAll();
-    const key = this._getGroupKey(group);
-    const items = Array.isArray(db[key]) ? db[key] : [];
+    const groupType = this._getGroupType(group);
+    const existing = this.db.prepare('SELECT * FROM saldo_items WHERE id = ? AND group_type = ?').get(id, groupType);
 
-    const idx = items.findIndex(i => i.id == id);
-    if (idx === -1) {
+    if (!existing) {
       throw new Error(`Item saldo dengan ID "${id}" tidak ditemukan pada grup ${group}`);
     }
+
+    let newLabel = existing.label;
+    let newDesc = existing.description;
 
     if (label !== undefined) {
       const cleanLabel = this._cleanText(label);
       if (!cleanLabel) throw new Error('Label tidak boleh kosong');
-      items[idx].label = cleanLabel;
+      newLabel = cleanLabel;
     }
 
     if (description !== undefined) {
-      items[idx].description = this._cleanText(description);
+      newDesc = this._cleanText(description);
     }
 
-    items[idx].updatedAt = new Date().toISOString();
-    db[key] = items;
-    this._saveAll(db);
-    return items[idx];
+    const updatedAt = new Date().toISOString();
+    const stmt = this.db.prepare(`
+      UPDATE saldo_items
+      SET label = ?, description = ?, updatedAt = ?
+      WHERE id = ? AND group_type = ?
+    `);
+
+    stmt.run(newLabel, newDesc, updatedAt, id, groupType);
+    return {
+      ...existing,
+      label: newLabel,
+      description: newDesc,
+      updatedAt
+    };
   }
 
   delete(id, group = 'siang_sore') {
-    const db = this._readAll();
-    const key = this._getGroupKey(group);
-    const items = Array.isArray(db[key]) ? db[key] : [];
+    const groupType = this._getGroupType(group);
+    const existing = this.db.prepare('SELECT * FROM saldo_items WHERE id = ? AND group_type = ?').get(id, groupType);
 
-    const idx = items.findIndex(i => i.id == id);
-    if (idx === -1) {
+    if (!existing) {
       throw new Error(`Item saldo dengan ID "${id}" tidak ditemukan pada grup ${group}`);
     }
 
-    items.splice(idx, 1);
-    db[key] = items;
-    this._saveAll(db);
+    const stmt = this.db.prepare('DELETE FROM saldo_items WHERE id = ? AND group_type = ?');
+    stmt.run(id, groupType);
     return true;
   }
 
   resetDefaults(group = 'siang_sore') {
-    const db = this._readAll();
-    const key = this._getGroupKey(group);
-    if (key === 'saldo_items_pagi_malam') {
-      db.saldo_items_pagi_malam = [...DEFAULT_SALDO_ITEMS_PAGI_MALAM];
-      this._saveAll(db);
-      return db.saldo_items_pagi_malam;
-    } else {
-      db.saldo_items_siang_sore = [...DEFAULT_SALDO_ITEMS_SIANG_SORE];
-      this._saveAll(db);
-      return db.saldo_items_siang_sore;
-    }
+    const groupType = this._getGroupType(group);
+    const defaults = (groupType === 'pagi_malam') ? DEFAULT_SALDO_ITEMS_PAGI_MALAM : DEFAULT_SALDO_ITEMS_SIANG_SORE;
+
+    const resetTx = this.db.transaction(() => {
+      this.db.prepare('DELETE FROM saldo_items WHERE group_type = ?').run(groupType);
+      const insertStmt = this.db.prepare(`
+        INSERT INTO saldo_items (id, label, description, group_type, sort_order, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `);
+
+      const now = new Date().toISOString();
+      defaults.forEach((item, index) => {
+        insertStmt.run(item.id, item.label, item.description || '', groupType, index + 1, now);
+      });
+    });
+
+    resetTx();
+    return this.getAll(groupType);
   }
 
   reorder(itemIds, group = 'siang_sore') {
-    const db = this._readAll();
-    const key = this._getGroupKey(group);
-    const items = Array.isArray(db[key]) ? db[key] : [];
     if (!Array.isArray(itemIds)) {
       throw new Error('Daftar ID item harus berupa array');
     }
 
-    const itemMap = new Map(items.map(item => [item.id, item]));
-    const reordered = [];
-    for (const id of itemIds) {
-      if (itemMap.has(id)) {
-        reordered.push(itemMap.get(id));
-        itemMap.delete(id);
-      }
-    }
-    for (const remaining of itemMap.values()) {
-      reordered.push(remaining);
-    }
+    const groupType = this._getGroupType(group);
+    const updateStmt = this.db.prepare(`
+      UPDATE saldo_items
+      SET sort_order = ?
+      WHERE id = ? AND group_type = ?
+    `);
 
-    db[key] = reordered;
-    this._saveAll(db);
-    return reordered;
+    const reorderTx = this.db.transaction(() => {
+      itemIds.forEach((id, index) => {
+        updateStmt.run(index + 1, id, groupType);
+      });
+    });
+
+    reorderTx();
+    return this.getAll(groupType);
   }
 }
 
