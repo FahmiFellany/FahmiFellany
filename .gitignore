@@ -1,102 +1,24 @@
-# ==========================================
-# 1. Environment & Secret Files (Keamanan)
-# ==========================================
+# Environment & Secrets
 .env
 .env.*
 !.env.example
 
-# Vault & Keyring
-.env.vault
-.env.me
-
-# SSH, SSL, Certificates & Keys
-id_*
-*.pub
-*.pem
-*.key
-*.crt
-*.cer
-*.pfx
-*.p12
-
-# Folder Rahasia / Credentials
-secrets/
-credentials/
-private/
-.aws/
-
-# ==========================================
-# 2. Database & Data Storage (Sensitif)
-# ==========================================
-# File JSON Data Operasional Runtime
-data/database.json
+# Data Storage (JSON Runtime)
 data/*.json
+!data/.gitkeep
 
-# Data SQLite, DB Dumps & Backups
-data/*.sqlite
-data/*.sqlite-wal
-data/*.sqlite-shm
-data/*.db
-data/*.db-journal
-data/*.sql
-data/*.dump
-data/*.bak
-data/*.csv
-
-# ==========================================
-# 3. Dependencies, Logs & Cache
-# ==========================================
+# Dependencies & Logs
 node_modules/
-.pnpm-store/
-.npm/
-.eslintcache/
-.node_repl_history
-
-# Logs
 *.log
-logs/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
 
-# Process ID & Locks
-*.pid
-*.seed
-*.pid.lock
-
-# ==========================================
-# 4. OS & IDE System Files
-# ==========================================
+# OS & IDE Files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 desktop.ini
-
-# IDE Configs
 .vscode/
 .idea/
-*.swp
-*.swo
-*.sublime-project
-*.sublime-workspace
 
-# ==========================================
-# 5. Temporary & Build Artifacts
-# ==========================================
-dist/
-build/
-coverage/
+# Temporary Files
 scratch/
 temp/
 tmp/
-
-# ==========================================
-# 6. Pengecualian Penting (Whitelist)
-# ==========================================
-!.gitkeep
-!.env.example
