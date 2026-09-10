@@ -26,6 +26,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Verify Public Folder Security
+        run: |
+          if [ -f "./public/.env" ]; then
+            echo "Security Error: .env file detected inside public folder!"
+            exit 1
+          fi
+
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
