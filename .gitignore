@@ -2,43 +2,55 @@
 # 1. Environment & Secret Files (Keamanan)
 # ==========================================
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# PENGECUALIAN: .env.example TETAP DILACAK (Jangan di-gitignore)
+.env.*
 !.env.example
 
-# SSH & SSL Keys
+# Vault & Keyring
+.env.vault
+.env.me
+
+# SSH, SSL, Certificates & Keys
 id_*
 *.pub
 *.pem
-id_rsa
-id_rsa.*
-id_ed25519
-id_ed25519.*
 *.key
+*.crt
+*.cer
+*.pfx
+*.p12
+
+# Folder Rahasia / Credentials
+secrets/
+credentials/
+private/
+.aws/
 
 # ==========================================
 # 2. Database & Data Storage (Sensitif)
 # ==========================================
-# Data SQLite & File Log WAL
+# File JSON Data Operasional Runtime
+data/database.json
+data/*.json
+
+# Data SQLite, DB Dumps & Backups
 data/*.sqlite
 data/*.sqlite-wal
 data/*.sqlite-shm
 data/*.db
 data/*.db-journal
-
-# File JSON Data Operasional Runtime
-data/database.json
-data/*.json
+data/*.sql
+data/*.dump
+data/*.bak
+data/*.csv
 
 # ==========================================
-# 3. Dependencies & Package Managers
+# 3. Dependencies, Logs & Cache
 # ==========================================
 node_modules/
 .pnpm-store/
+.npm/
+.eslintcache/
+.node_repl_history
 
 # Logs
 *.log
@@ -47,6 +59,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# Process ID & Locks
+*.pid
+*.seed
+*.pid.lock
 
 # ==========================================
 # 4. OS & IDE System Files
@@ -58,6 +75,7 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
 # IDE Configs
 .vscode/
@@ -78,7 +96,7 @@ temp/
 tmp/
 
 # ==========================================
-# 6. Global Pengecualian .gitkeep & .env.example
+# 6. Pengecualian Penting (Whitelist)
 # ==========================================
-# PENGECUALIAN GLOBAL: File .gitkeep di folder mana pun TETAP DILACAK untuk menjaga struktur folder kosong di Git
 !.gitkeep
+!.env.example
