@@ -4,13 +4,11 @@ on:
   push:
     branches: ["main"]
 
-# Mengatur izin token GITHUB_TOKEN untuk melakukan deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Menghindari bentrokan deployment yang berjalan bersamaan
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -19,7 +17,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps:deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -28,10 +26,9 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Artifact from Public Folder
+      - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Perintah krusial: mengarahkan target hanya ke folder public Anda
           path: './public'
 
       - name: Deploy to GitHub Pages
