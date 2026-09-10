@@ -3,7 +3,6 @@ const express = require('express');
 const path = require('path');
 const { exec } = require('child_process');
 
-const MigrateJsonToSqlite = require('./src/utils/MigrateJsonToSqlite');
 const DateTimeConverterModel = require('./src/models/DateTimeConverterModel');
 const VariableModel = require('./src/models/VariableModel');
 const SaldoItemModel = require('./src/models/SaldoItemModel');
@@ -25,9 +24,6 @@ class ServerApp {
     this.app = express();
     this.port = process.env.PORT || port;
     this.host = process.env.HOST || host;
-
-    // 0. Jalankan Auto-Migrasi dari database.json ke SQLite database.sqlite (jika ada)
-    MigrateJsonToSqlite.runMigration();
 
     // Inisialisasi Models & Controllers
     this.variableModel = new VariableModel();
@@ -62,7 +58,7 @@ class ServerApp {
       next();
     });
 
-    // 2. Parser Body Body Request JSON & URL-Encoded
+    // 2. Parser Body Request JSON & URL-Encoded
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -71,20 +67,6 @@ class ServerApp {
   }
 
   _configureRoutes() {
-    // Mount rute API secara simetris dan teratur sesuai standar RESTful:
-    // - POST   /api/convert
-    // - GET    /api/variables
-    // - POST   /api/variables
-    // - PUT    /api/variables/:id
-    // - DELETE /api/variables/:id
-    // - POST   /api/variables/reset
-    // - GET    /api/saldo-items
-    // - POST   /api/saldo-items
-    // - PUT    /api/saldo-items/:id
-    // - DELETE /api/saldo-items/:id
-    // - POST   /api/saldo-items/reset
-    // - POST   /api/webhook/gitlab
-    // - POST   /webhook/gitlab
     this.app.use('/api/convert', this.converterRoutes.getRouter());
     this.app.use('/api/variables', this.variableRoutes.getRouter());
     this.app.use('/api/saldo-items', this.saldoItemRoutes.getRouter());
@@ -92,7 +74,7 @@ class ServerApp {
     this.app.use('/webhook/gitlab', this.gitlabWebhookRoutes.getRouter());
     this.app.use('/api/gitlab', this.gitlabWebhookRoutes.getRouter());
 
-    // API 404 Fallback - Selalu mengembalikan JSON (mencegah HTML <!DOCTYPE ...>)
+    // API 404 Fallback - Selalu mengembalikan JSON
     this.app.use('/api/*', (req, res) => {
       res.status(404).json({
         success: false,
@@ -115,7 +97,6 @@ class ServerApp {
     const interfaces = os.networkInterfaces();
     for (const name of Object.keys(interfaces)) {
       for (const iface of interfaces[name]) {
-        // Skip internal (loopback) dan non-IPv4
         if (iface.family === 'IPv4' && !iface.internal) {
           return iface.address;
         }
@@ -144,7 +125,7 @@ class ServerApp {
       const networkIP = this._getLocalIP();
       const networkUrl = `http://${networkIP}:${this.port}`;
       console.log(`==================================================`);
-      console.log(` Web Server OOP MVC (REST API & CORS Ready)`);
+      console.log(` Web Server OOP MVC (REST API & JSON Storage Ready)`);
       console.log(` Berjalan di host: ${this.host}`);
       console.log(``);
       console.log(`   Local:   ${localUrl}`);

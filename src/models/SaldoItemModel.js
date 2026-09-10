@@ -1,4 +1,4 @@
-const dbInstance = require('../config/Database');
+const jsonDb = require('../config/JsonDatabase');
 
 const DEFAULT_SALDO_ITEMS_SIANG_SORE = [
   { id: 'pln_jatel', label: 'Saldo PLN - JATEL :', description: 'PLN JATEL' },
@@ -46,32 +46,43 @@ const DEFAULT_SALDO_ITEMS_PAGI_MALAM = [
 
 /**
  * SaldoItemModel
- * Model backend OOP untuk mengelola CRUD Item Saldo Biller dengan database SQLite.
+ * Model backend OOP untuk mengelola CRUD Item Saldo Biller berbasis File JSON (database.json).
  */
 class SaldoItemModel {
   constructor() {
-    this.db = dbInstance.getConnection();
+    this.jsonDb = jsonDb;
     this._ensureItemsExist();
   }
 
+  _getGroupKey(group) {
+    if (group === 'pagi_malam' || group === 'pagi' || group === 'malam') {
+      return 'saldo_items_pagi_malam';
+    }
+    return 'saldo_items_siang_sore';
+  }
+
   _ensureItemsExist() {
-    const count = this.db.prepare('SELECT COUNT(*) AS count FROM saldo_items').get().count;
-    if (count === 0) {
-      this.resetDefaults('siang_sore');
-      this.resetDefaults('pagi_malam');
+    const data = this.jsonDb.read();
+    let modified = false;
+
+    if (!data.saldo_items_siang_sore || data.saldo_items_siang_sore.length === 0) {
+      data.saldo_items_siang_sore = DEFAULT_SALDO_ITEMS_SIANG_SORE.map(item => ({ ...item }));
+      modified = true;
+    }
+
+    if (!data.saldo_items_pagi_malam || data.saldo_items_pagi_malam.length === 0) {
+      data.saldo_items_pagi_malam = DEFAULT_SALDO_ITEMS_PAGI_MALAM.map(item => ({ ...item }));
+      modified = true;
+    }
+
+    if (modified) {
+      this.jsonDb.write(data);
     }
   }
 
   _cleanText(str) {
     if (!str || typeof str !== 'string') return '';
     return str.replace(/<[^>]*>?/gm, '').trim();
-  }
-
-  _getGroupType(group) {
-    if (group === 'pagi_malam' || group === 'pagi' || group === 'malam') {
-      return 'pagi_malam';
-    }
-    return 'siang_sore';
   }
 
   _generateId(label) {
@@ -84,14 +95,9 @@ class SaldoItemModel {
   }
 
   getAll(group = 'siang_sore') {
-    const groupType = this._getGroupType(group);
-    const stmt = this.db.prepare(`
-      SELECT id, label, description, createdAt, updatedAt
-      FROM saldo_items
-      WHERE group_type = ?
-      ORDER BY sort_order ASC, rowid ASC
-    `);
-    return stmt.all(groupType);
+    const groupKey = this._getGroupKey(group);
+    const data = this.jsonDb.read();
+    return data[groupKey] || [];
   }
 
   create({ label, description, group = 'siang_sore' }) {
@@ -102,41 +108,44 @@ class SaldoItemModel {
       throw new Error('Label / Nama Saldo wajib diisi');
     }
 
-    const groupType = this._getGroupType(group);
+    const groupKey = this._getGroupKey(group);
+    const data = this.jsonDb.read();
+    const items = data[groupKey] || [];
+
     let baseId = this._generateId(cleanLabel);
     let finalId = baseId;
     let counter = 1;
 
-    while (this.db.prepare('SELECT id FROM saldo_items WHERE id = ? AND group_type = ?').get(finalId, groupType)) {
+    while (items.some(item => String(item.id) === finalId)) {
       finalId = `${baseId}_${counter++}`;
     }
 
-    const maxSort = this.db.prepare('SELECT MAX(sort_order) AS max_sort FROM saldo_items WHERE group_type = ?').get(groupType);
-    const nextSort = (maxSort && maxSort.max_sort !== null) ? maxSort.max_sort + 1 : 1;
     const createdAt = new Date().toISOString();
-
-    const stmt = this.db.prepare(`
-      INSERT INTO saldo_items (id, label, description, group_type, sort_order, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(finalId, cleanLabel, cleanDesc, groupType, nextSort, createdAt);
-    return {
+    const newItem = {
       id: finalId,
       label: cleanLabel,
       description: cleanDesc,
       createdAt
     };
+
+    items.push(newItem);
+    data[groupKey] = items;
+    this.jsonDb.write(data);
+
+    return newItem;
   }
 
   update(id, { label, description, group = 'siang_sore' }) {
-    const groupType = this._getGroupType(group);
-    const existing = this.db.prepare('SELECT * FROM saldo_items WHERE id = ? AND group_type = ?').get(id, groupType);
+    const groupKey = this._getGroupKey(group);
+    const data = this.jsonDb.read();
+    const items = data[groupKey] || [];
 
-    if (!existing) {
+    const index = items.findIndex(item => String(item.id) === String(id));
+    if (index === -1) {
       throw new Error(`Item saldo dengan ID "${id}" tidak ditemukan pada grup ${group}`);
     }
 
+    const existing = items[index];
     let newLabel = existing.label;
     let newDesc = existing.description;
 
@@ -151,53 +160,45 @@ class SaldoItemModel {
     }
 
     const updatedAt = new Date().toISOString();
-    const stmt = this.db.prepare(`
-      UPDATE saldo_items
-      SET label = ?, description = ?, updatedAt = ?
-      WHERE id = ? AND group_type = ?
-    `);
-
-    stmt.run(newLabel, newDesc, updatedAt, id, groupType);
-    return {
+    const updatedItem = {
       ...existing,
       label: newLabel,
       description: newDesc,
       updatedAt
     };
+
+    items[index] = updatedItem;
+    data[groupKey] = items;
+    this.jsonDb.write(data);
+
+    return updatedItem;
   }
 
   delete(id, group = 'siang_sore') {
-    const groupType = this._getGroupType(group);
-    const existing = this.db.prepare('SELECT * FROM saldo_items WHERE id = ? AND group_type = ?').get(id, groupType);
+    const groupKey = this._getGroupKey(group);
+    const data = this.jsonDb.read();
+    const items = data[groupKey] || [];
 
-    if (!existing) {
+    const initialLength = items.length;
+    data[groupKey] = items.filter(item => String(item.id) !== String(id));
+
+    if (data[groupKey].length === initialLength) {
       throw new Error(`Item saldo dengan ID "${id}" tidak ditemukan pada grup ${group}`);
     }
 
-    const stmt = this.db.prepare('DELETE FROM saldo_items WHERE id = ? AND group_type = ?');
-    stmt.run(id, groupType);
+    this.jsonDb.write(data);
     return true;
   }
 
   resetDefaults(group = 'siang_sore') {
-    const groupType = this._getGroupType(group);
-    const defaults = (groupType === 'pagi_malam') ? DEFAULT_SALDO_ITEMS_PAGI_MALAM : DEFAULT_SALDO_ITEMS_SIANG_SORE;
+    const groupKey = this._getGroupKey(group);
+    const defaults = (groupKey === 'saldo_items_pagi_malam') ? DEFAULT_SALDO_ITEMS_PAGI_MALAM : DEFAULT_SALDO_ITEMS_SIANG_SORE;
+    const data = this.jsonDb.read();
 
-    const resetTx = this.db.transaction(() => {
-      this.db.prepare('DELETE FROM saldo_items WHERE group_type = ?').run(groupType);
-      const insertStmt = this.db.prepare(`
-        INSERT INTO saldo_items (id, label, description, group_type, sort_order, createdAt)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `);
+    data[groupKey] = defaults.map(item => ({ ...item }));
+    this.jsonDb.write(data);
 
-      const now = new Date().toISOString();
-      defaults.forEach((item, index) => {
-        insertStmt.run(item.id, item.label, item.description || '', groupType, index + 1, now);
-      });
-    });
-
-    resetTx();
-    return this.getAll(groupType);
+    return data[groupKey];
   }
 
   reorder(itemIds, group = 'siang_sore') {
@@ -205,21 +206,27 @@ class SaldoItemModel {
       throw new Error('Daftar ID item harus berupa array');
     }
 
-    const groupType = this._getGroupType(group);
-    const updateStmt = this.db.prepare(`
-      UPDATE saldo_items
-      SET sort_order = ?
-      WHERE id = ? AND group_type = ?
-    `);
+    const groupKey = this._getGroupKey(group);
+    const data = this.jsonDb.read();
+    const items = data[groupKey] || [];
 
-    const reorderTx = this.db.transaction(() => {
-      itemIds.forEach((id, index) => {
-        updateStmt.run(index + 1, id, groupType);
-      });
+    const itemMap = new Map(items.map(item => [String(item.id), item]));
+    const reordered = [];
+
+    itemIds.forEach(id => {
+      if (itemMap.has(String(id))) {
+        reordered.push(itemMap.get(String(id)));
+        itemMap.delete(String(id));
+      }
     });
 
-    reorderTx();
-    return this.getAll(groupType);
+    // Masukkan sisa item yang mungkin tidak ada di itemIds (jika ada)
+    itemMap.forEach(item => reordered.push(item));
+
+    data[groupKey] = reordered;
+    this.jsonDb.write(data);
+
+    return data[groupKey];
   }
 }
 
