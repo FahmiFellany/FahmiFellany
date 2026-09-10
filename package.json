@@ -1,0 +1,13 @@
+{
+  "name": "date-time-converter",
+  "version": "1.0.0",
+  "description": "Aplikasi web lokal pengubah format tanggal dan jam",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2"
+  }
+}

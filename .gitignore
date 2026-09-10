@@ -1,0 +1,24 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Data Storage (JSON Runtime)
+data/*.json
+!data/.gitkeep
+
+# Dependencies & Logs
+node_modules/
+*.log
+
+# OS & IDE Files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Temporary Files
+scratch/
+temp/
+tmp/
