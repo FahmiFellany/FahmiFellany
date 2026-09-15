@@ -250,8 +250,8 @@ export class ConverterModel {
 
   /**
    * Pembersihan Teks Chat Duplikat/Berulang
-   * - Menghapus kuotasi balasan chat sebelumnya yang terbawa dalam kurung *(...)* atau (...) atau >
-   * - Setiap blok timestamp [...] memulai konteks pesan baru
+   * - Menghapus kuotasi balasan chat dalam *(...)* atau (...) atau >
+   * - Menghapus blok chat pertanyaan awal jika ada blok chat balasan berikutnya yang membahas transaksi/IDPEL/PPID yang sama
    * @param {string} inputText Teks mentah dari input textarea
    * @returns {{ cleanedText: string, cleanedDupCount: number }} Teks yang sudah dibersihkan dan jumlah duplikasi terdeteksi
    */
@@ -289,10 +289,8 @@ export class ConverterModel {
       return { cleanedText: textToProcess.trim(), cleanedDupCount: dupCount };
     }
 
-    // Ekstrak blok-blok pesan chat berdasarkan timestamp header [...]
+    // Ekstrak blok-blok pesan chat
     const blocks = [];
-    const previousMessageBodies = [];
-
     for (let i = 0; i < matchesProcessed.length; i++) {
       const match = matchesProcessed[i];
       const headerStr = match[0];
@@ -301,19 +299,61 @@ export class ConverterModel {
       const nextStartIndex = (i + 1 < matchesProcessed.length) ? matchesProcessed[i + 1].index : textToProcess.length;
       const bodyStr = textToProcess.slice(headerEndIndex, nextStartIndex);
 
+      // Ekstrak ID unik / kata kunci transaksi (seperti PPID, IDPEL, No Resi, Alfanumerik >= 5 karakter)
+      const ids = new Set();
+      const idMatches = bodyStr.match(/\b[A-Za-z0-9_-]{5,}\b/g);
+      if (idMatches) {
+        idMatches.forEach(id => {
+          if (!/^(?:pembayaran|berhasil|hasil|pengecekan|transaksi|status|sukses|periode|tanggal|total|nama|idpel|ppid)$/i.test(id)) {
+            ids.add(id.toUpperCase());
+          }
+        });
+      }
+
       blocks.push({
         header: headerStr,
-        body: bodyStr
+        body: bodyStr,
+        ids
       });
     }
 
+    // Identifikasi blok mana yang merupakan pesan pertanyaan terduplikat oleh pesan jawaban di bawahnya
+    const isBlockDuplicate = new Array(blocks.length).fill(false);
+
+    for (let i = 0; i < blocks.length - 1; i++) {
+      const currentBlock = blocks[i];
+      if (currentBlock.ids.size === 0) continue;
+
+      // Cek apakah ada blok berikutnya yang berbagi setidaknya satu ID unik transaksi / PPID / IDPEL yang sama
+      for (let j = i + 1; j < blocks.length; j++) {
+        const nextBlock = blocks[j];
+        let hasMatchingId = false;
+
+        for (const id of currentBlock.ids) {
+          if (nextBlock.ids.has(id)) {
+            hasMatchingId = true;
+            break;
+          }
+        }
+
+        if (hasMatchingId) {
+          isBlockDuplicate[i] = true;
+          dupCount++;
+          break;
+        }
+      }
+    }
+
     const processedBlocks = [];
+    const previousMessageBodies = [];
 
     for (let i = 0; i < blocks.length; i++) {
+      if (isBlockDuplicate[i]) continue;
+
       const block = blocks[i];
       let body = block.body;
 
-      // Hapus kuotasi dalam kurung (...) jika isinya memuat kutipan dari pesan di blok sebelumnya
+      // Hapus kuotasi dalam kurung (...) jika isinya memuat kutipan dari pesan sebelumnya
       body = body.replace(/\(([\s\S]*?)\)/g, (match, innerText) => {
         const cleanInner = innerText.trim();
         if (cleanInner && previousMessageBodies.some(prev => prev.includes(cleanInner) || cleanInner.includes(prev))) {
