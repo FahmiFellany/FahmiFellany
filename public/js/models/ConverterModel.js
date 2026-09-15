@@ -299,12 +299,12 @@ export class ConverterModel {
       const nextStartIndex = (i + 1 < matchesProcessed.length) ? matchesProcessed[i + 1].index : textToProcess.length;
       const bodyStr = textToProcess.slice(headerEndIndex, nextStartIndex);
 
-      // Ekstrak ID unik / kata kunci transaksi (seperti PPID, IDPEL, No Resi, Alfanumerik >= 5 karakter)
+      // Ekstrak ID unik / kata kunci transaksi (seperti PPID, IDPEL, No Resi, Alfanumerik >= 4 karakter)
       const ids = new Set();
-      const idMatches = bodyStr.match(/\b[A-Za-z0-9_-]{5,}\b/g);
+      const idMatches = bodyStr.match(/\b[A-Za-z0-9_-]{4,}\b/g);
       if (idMatches) {
         idMatches.forEach(id => {
-          if (!/^(?:pembayaran|berhasil|hasil|pengecekan|transaksi|status|sukses|periode|tanggal|total|nama|idpel|ppid)$/i.test(id)) {
+          if (!/^(?:pembayaran|berhasil|hasil|pengecekan|transaksi|status|sukses|periode|tanggal|total|nama|idpel|ppid|bantu|mohon|tolong|mana)$/i.test(id)) {
             ids.add(id.toUpperCase());
           }
         });
@@ -322,17 +322,29 @@ export class ConverterModel {
 
     for (let i = 0; i < blocks.length - 1; i++) {
       const currentBlock = blocks[i];
-      if (currentBlock.ids.size === 0) continue;
 
-      // Cek apakah ada blok berikutnya yang berbagi setidaknya satu ID unik transaksi / PPID / IDPEL yang sama
+      // Cek apakah ada blok berikutnya yang berbagi setidaknya satu ID unik transaksi / PPID / IDPEL yang sama,
+      // atau merupakan balasan atas pesan pertanyaan di atasnya
       for (let j = i + 1; j < blocks.length; j++) {
         const nextBlock = blocks[j];
         let hasMatchingId = false;
 
-        for (const id of currentBlock.ids) {
-          if (nextBlock.ids.has(id)) {
+        if (currentBlock.ids.size > 0) {
+          for (const id of currentBlock.ids) {
+            if (nextBlock.ids.has(id)) {
+              hasMatchingId = true;
+              break;
+            }
+          }
+        }
+
+        if (!hasMatchingId) {
+          const currentHeaderLower = currentBlock.header.toLowerCase();
+          const nextHeaderLower = nextBlock.header.toLowerCase();
+          const isQueryBlock = currentHeaderLower.includes('idm') || /bantu|mohon|tolong|cek/i.test(currentBlock.body);
+          const isResponseBlock = nextHeaderLower.includes('mkm') || /hasil pengecekan|ppid|idpel|status/i.test(nextBlock.body);
+          if (isQueryBlock && isResponseBlock) {
             hasMatchingId = true;
-            break;
           }
         }
 
@@ -368,7 +380,7 @@ export class ConverterModel {
         previousMessageBodies.push(cleanBodyText);
       }
 
-      body = body.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+      body = body.split('\n').map(line => line.trimEnd()).join('\n').replace(/\n{3,}/g, '\n\n').trim();
 
       if (!body && blocks.length > 1) {
         dupCount++;
