@@ -9,6 +9,7 @@ export class ConverterModel {
     this.hourOffset = '1s'; // Default +1 Detik
     this.wrapperStyle = 'symbol'; // 'symbol', 'clean', 'brackets'
     this.autoConvert = true;
+    this.autoCleanDuplicates = true;
     this.resultText = '';
     this.matchCount = 0;
 
@@ -248,10 +249,9 @@ export class ConverterModel {
   }
 
   /**
-   * Pembersihan Teks Chat Duplikat/Berulang (Multi-Line, Sender Header & History Line Skipping)
-   * Memecah teks ke dalam blok pesan chat berdasarkan pola timestamp & pengirim pesan,
-   * lalu menghapus baris-baris kuotasi yang sudah pernah muncul pada blok-blok pesan sebelumnya.
-   * Jika suatu blok pesan 100% berisi kuotasi/duplikat (kosong setelah dibersihkan), blok tersebut tidak ditampilkan.
+   * Pembersihan Teks Chat Duplikat/Berulang
+   * - Menghapus kuotasi balasan chat sebelumnya yang terbawa dalam kurung *(...)* atau (...) atau >
+   * - Setiap blok timestamp [...] memulai konteks pesan baru
    * @param {string} inputText Teks mentah dari input textarea
    * @returns {{ cleanedText: string, cleanedDupCount: number }} Teks yang sudah dibersihkan dan jumlah duplikasi terdeteksi
    */
@@ -260,27 +260,41 @@ export class ConverterModel {
       return { cleanedText: inputText, cleanedDupCount: 0 };
     }
 
-    // Regex untuk mencocokkan header timestamp + opsional nama pengirim pesan chat (mendukung : maupun - pengirim)
-    // Contoh: "[2:21 PM, 9/7/2026] IT DCO-VSI Baru: " atau "9/8/2026, 09.45 - Nama:" atau "[09.33, 8/9/2026] +62 858-9158-7045: "
+    let dupCount = 0;
+
+    // 1. Hapus kuotasi balasan WhatsApp berformat *(...)* yang merupakan salinan pesan sebelumnya
+    let textToProcess = inputText.replace(/\*\s*\(([\s\S]*?)\)\s*\*/g, () => {
+      dupCount++;
+      return '';
+    });
+
+    // 2. Hapus baris kuotasi balasan yang diawali karakter >
+    textToProcess = textToProcess.replace(/^\s*>.*$/gm, () => {
+      dupCount++;
+      return '';
+    });
+
+    // Regex untuk mencocokkan header timestamp + opsional pengirim (e.g. "[12.02, 15/9/2026] idm CUM:")
     const timestampHeaderRegex = /(?:(?:\d+[\.\)]\s*)?(?:\[\s*[^\]]+\s*\]|\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}\s+\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?|\d{1,2}[\.:]\d{1,2}\s+\d{1,2}[\/\-\.][A-Za-z]{3}[\/\-\.]\d{4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}T\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?Z?)(?:\s*[^:\n]+:|\s*-\s+[^:\n]+:?)?)/gi;
 
-    // Cari semua lokasi header timestamp dalam teks
-    const matches = [...inputText.matchAll(timestampHeaderRegex)];
+    const matches = [...textToProcess.matchAll(timestampHeaderRegex)];
 
-    // Jika tidak ada header timestamp yang cocok, kembalikan teks asli
     if (matches.length === 0) {
-      return { cleanedText: inputText, cleanedDupCount: 0 };
+      const cleanSimple = textToProcess.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+      return { cleanedText: cleanSimple, cleanedDupCount: dupCount };
     }
 
-    // Ekstrak blok-blok pesan chat (Header + Isi Pesan)
+    // Ekstrak blok-blok pesan chat berdasarkan timestamp header [...]
     const blocks = [];
+    const previousMessageBodies = [];
+
     for (let i = 0; i < matches.length; i++) {
       const match = matches[i];
       const headerStr = match[0];
       const startIndex = match.index;
       const headerEndIndex = startIndex + headerStr.length;
-      const nextStartIndex = (i + 1 < matches.length) ? matches[i + 1].index : inputText.length;
-      const bodyStr = inputText.slice(headerEndIndex, nextStartIndex);
+      const nextStartIndex = (i + 1 < matches.length) ? matches[i + 1].index : textToProcess.length;
+      const bodyStr = textToProcess.slice(headerEndIndex, nextStartIndex);
 
       blocks.push({
         header: headerStr,
@@ -288,62 +302,44 @@ export class ConverterModel {
       });
     }
 
-    // Set untuk menyimpan baris-baris pesan yang sudah pernah muncul pada blok sebelumnya
-    const seenPreviousLines = new Set();
-    const cleanedBlocks = [];
-    let dupCount = 0;
+    const processedBlocks = [];
 
     for (let i = 0; i < blocks.length; i++) {
       const block = blocks[i];
       let body = block.body;
 
-      // 1. Hapus duplikasi frase berulang dalam body blok itu sendiri
-      let prevTemp;
-      do {
-        prevTemp = body;
-        body = body.replace(/(\b.+?\b)\s+\1(?=\s+|$)/gi, '$1');
-      } while (body !== prevTemp);
-
-      const bodyLines = body.split(/\r?\n/);
-      const cleanedBodyLines = [];
-
-      // 2. Filter baris-baris kuotasi terduplikat
-      for (let j = 0; j < bodyLines.length; j++) {
-        const rawLine = bodyLines[j];
-        const trimmedLine = rawLine.trim();
-
-        // Jika baris ini sudah pernah muncul pada pesan sebelumnya, lewati
-        if (trimmedLine && seenPreviousLines.has(trimmedLine)) {
+      // Hapus kuotasi dalam kurung (...) jika isinya memuat kutipan dari pesan di blok sebelumnya
+      body = body.replace(/\(([\s\S]*?)\)/g, (match, innerText) => {
+        const cleanInner = innerText.trim();
+        if (cleanInner && previousMessageBodies.some(prev => prev.includes(cleanInner) || cleanInner.includes(prev))) {
           dupCount++;
-          continue;
+          return '';
         }
-
-        cleanedBodyLines.push(rawLine);
-      }
-
-      // Simpan baris-baris dari blok ini ke Set untuk perbandingan blok berikutnya
-      bodyLines.forEach(line => {
-        const tr = line.trim();
-        if (tr) seenPreviousLines.add(tr);
+        return match;
       });
 
-      let cleanedBody = cleanedBodyLines.join('\n').trim();
+      const cleanBodyText = body.trim();
+      if (cleanBodyText) {
+        previousMessageBodies.push(cleanBodyText);
+      }
 
-      // 3. 💡 JIKA BLOK PESAN 100% BERISI KUOTASI TERDUPLIKAT (KOSONG SETELAH DIBERSIHKAN), SANGKUTAN TIDAK DITAMPILKAN
-      if (!cleanedBody) {
+      body = body.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+
+      if (!body && blocks.length > 1) {
         dupCount++;
         continue;
       }
 
       const header = block.header;
       const formattedHeader = (header.endsWith(' ') || header.endsWith('\n')) ? header : header + ' ';
-      cleanedBlocks.push(formattedHeader + cleanedBody);
+      processedBlocks.push(formattedHeader + body);
     }
 
-    // Ambil teks jika ada awalan sebelum header pertama
-    const prefixText = inputText.slice(0, matches[0].index).trim();
-    const cleanedText = (prefixText ? prefixText + '\n' : '') + cleanedBlocks.join('\n');
-    return { cleanedText, cleanedDupCount: dupCount };
+    const prefixText = textToProcess.slice(0, matches[0].index).trim();
+    let finalCleaned = (prefixText ? prefixText + '\n\n' : '') + processedBlocks.join('\n\n');
+    finalCleaned = finalCleaned.replace(/\n{3,}/g, '\n\n').trim();
+
+    return { cleanedText: finalCleaned, cleanedDupCount: dupCount };
   }
 
   /**
