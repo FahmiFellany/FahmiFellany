@@ -375,7 +375,7 @@ export class OcrModel {
 
   /**
    * Mengurai teks mentah (hasil OCR / input manual) menjadi field terformat berdasarkan kategori transaksi terpilih.
-   * Disertai judul header "Hasil pengecekan transaksi [Kategori]" di baris pertama.
+   * Disertai judul header "Hasil pengecekan untuk transaksi [Kategori]" di baris pertama.
    * @param {string} rawText 
    * @param {string} category ('prepaid', 'postpaid', 'dana', 'ovo', 'pdam', 'pgn', 'pbb', 'bpjs', 'jastel', 'fif', 'transfer_uang')
    * @returns {{ extractedMap: Object, formattedOutput: string, items: Array, totalExpected: number }}
@@ -493,8 +493,8 @@ export class OcrModel {
       catKey === 'generalpayment'
     );
     const headerLine = isNoCategorySuffix
-      ? 'Hasil pengecekan transaksi'
-      : `Hasil pengecekan transaksi ${categoryTitle}`;
+      ? 'Hasil pengecekan untuk transaksi'
+      : `Hasil pengecekan untuk transaksi ${categoryTitle}`;
 
     const formattedOutput = formattedLines.length > 0
       ? `${headerLine}\n${formattedLines.join('\n')}`
