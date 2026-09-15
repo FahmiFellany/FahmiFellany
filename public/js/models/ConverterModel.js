@@ -260,6 +260,16 @@ export class ConverterModel {
       return { cleanedText: inputText, cleanedDupCount: 0 };
     }
 
+    // Regex untuk mencocokkan header timestamp [...] (pembatas awal)
+    const timestampHeaderRegex = /(?:(?:\d+[\.\)]\s*)?(?:\[\s*[^\]]+\s*\]|\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}\s+\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?|\d{1,2}[\.:]\d{1,2}\s+\d{1,2}[\/\-\.][A-Za-z]{3}[\/\-\.]\d{4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}T\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?Z?)(?:\s*[^:\n]+:|\s*-\s+[^:\n]+:?)?)/gi;
+
+    const matches = [...inputText.matchAll(timestampHeaderRegex)];
+
+    // 💡 JIKA TIDAK ADA PEMBATAS AWAL TIMESTAMP [...], TIDAK ADA PEMBERSIHAN DUPLIKAT
+    if (matches.length === 0) {
+      return { cleanedText: inputText, cleanedDupCount: 0 };
+    }
+
     let dupCount = 0;
 
     // 1. Hapus kuotasi balasan WhatsApp berformat *(...)* yang merupakan salinan pesan sebelumnya
@@ -274,26 +284,21 @@ export class ConverterModel {
       return '';
     });
 
-    // Regex untuk mencocokkan header timestamp + opsional pengirim (e.g. "[12.02, 15/9/2026] idm CUM:")
-    const timestampHeaderRegex = /(?:(?:\d+[\.\)]\s*)?(?:\[\s*[^\]]+\s*\]|\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}\s+\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?|\d{1,2}[\.:]\d{1,2}\s+\d{1,2}[\/\-\.][A-Za-z]{3}[\/\-\.]\d{4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}T\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?Z?)(?:\s*[^:\n]+:|\s*-\s+[^:\n]+:?)?)/gi;
-
-    const matches = [...textToProcess.matchAll(timestampHeaderRegex)];
-
-    if (matches.length === 0) {
-      const cleanSimple = textToProcess.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
-      return { cleanedText: cleanSimple, cleanedDupCount: dupCount };
+    const matchesProcessed = [...textToProcess.matchAll(timestampHeaderRegex)];
+    if (matchesProcessed.length === 0) {
+      return { cleanedText: textToProcess.trim(), cleanedDupCount: dupCount };
     }
 
     // Ekstrak blok-blok pesan chat berdasarkan timestamp header [...]
     const blocks = [];
     const previousMessageBodies = [];
 
-    for (let i = 0; i < matches.length; i++) {
-      const match = matches[i];
+    for (let i = 0; i < matchesProcessed.length; i++) {
+      const match = matchesProcessed[i];
       const headerStr = match[0];
       const startIndex = match.index;
       const headerEndIndex = startIndex + headerStr.length;
-      const nextStartIndex = (i + 1 < matches.length) ? matches[i + 1].index : textToProcess.length;
+      const nextStartIndex = (i + 1 < matchesProcessed.length) ? matchesProcessed[i + 1].index : textToProcess.length;
       const bodyStr = textToProcess.slice(headerEndIndex, nextStartIndex);
 
       blocks.push({
@@ -335,7 +340,7 @@ export class ConverterModel {
       processedBlocks.push(formattedHeader + body);
     }
 
-    const prefixText = textToProcess.slice(0, matches[0].index).trim();
+    const prefixText = textToProcess.slice(0, matchesProcessed[0].index).trim();
     let finalCleaned = (prefixText ? prefixText + '\n\n' : '') + processedBlocks.join('\n\n');
     finalCleaned = finalCleaned.replace(/\n{3,}/g, '\n\n').trim();
 
