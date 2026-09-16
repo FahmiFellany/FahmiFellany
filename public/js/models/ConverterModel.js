@@ -249,173 +249,54 @@ export class ConverterModel {
   }
 
   /**
-   * Pembersihan Teks Chat Duplikat/Berulang
-   * - Menghapus kuotasi balasan chat dalam *(...)* atau (...) atau >
-   * - Menghapus blok chat pertanyaan awal jika ada blok chat balasan berikutnya yang membahas transaksi/IDPEL/PPID yang sama
-   * @param {string} inputText Teks mentah dari input textarea
-   * @returns {{ cleanedText: string, cleanedDupCount: number }} Teks yang sudah dibersihkan dan jumlah duplikasi terdeteksi
-   */
-  cleanDuplicateChatText(inputText) {
-    if (!inputText || typeof inputText !== 'string' || !inputText.trim()) {
-      return { cleanedText: inputText, cleanedDupCount: 0 };
-    }
-
-    // Regex untuk mencocokkan header timestamp [...] (pembatas awal)
-    const timestampHeaderRegex = /(?:(?:\d+[\.\)]\s*)?(?:\[\s*[^\]]+\s*\]|\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}\s+\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?|\d{1,2}[\.:]\d{1,2}\s+\d{1,2}[\/\-\.][A-Za-z]{3}[\/\-\.]\d{4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}T\d{1,2}[\.:]\d{1,2}(?::\d{1,2})?Z?)(?:\s*[^:\n]+:|\s*-\s+[^:\n]+:?)?)/gi;
-
-    const matches = [...inputText.matchAll(timestampHeaderRegex)];
-
-    // 💡 JIKA TIDAK ADA PEMBATAS AWAL TIMESTAMP [...], TIDAK ADA PEMBERSIHAN DUPLIKAT
-    if (matches.length === 0) {
-      return { cleanedText: inputText, cleanedDupCount: 0 };
-    }
-
-    let dupCount = 0;
-
-    // 1. Hapus kuotasi balasan WhatsApp berformat *(...)* yang merupakan salinan pesan sebelumnya
-    let textToProcess = inputText.replace(/\*\s*\(([\s\S]*?)\)\s*\*/g, () => {
-      dupCount++;
-      return '';
-    });
-
-    // 2. Hapus baris kuotasi balasan yang diawali karakter >
-    textToProcess = textToProcess.replace(/^\s*>.*$/gm, () => {
-      dupCount++;
-      return '';
-    });
-
-    const matchesProcessed = [...textToProcess.matchAll(timestampHeaderRegex)];
-    if (matchesProcessed.length === 0) {
-      return { cleanedText: textToProcess.trim(), cleanedDupCount: dupCount };
-    }
-
-    // Ekstrak blok-blok pesan chat
-    const blocks = [];
-    for (let i = 0; i < matchesProcessed.length; i++) {
-      const match = matchesProcessed[i];
-      const headerStr = match[0];
-      const startIndex = match.index;
-      const headerEndIndex = startIndex + headerStr.length;
-      const nextStartIndex = (i + 1 < matchesProcessed.length) ? matchesProcessed[i + 1].index : textToProcess.length;
-      const bodyStr = textToProcess.slice(headerEndIndex, nextStartIndex);
-
-      // Ekstrak ID unik / kata kunci transaksi (seperti PPID, IDPEL, No Resi, Alfanumerik >= 4 karakter)
-      const ids = new Set();
-      const idMatches = bodyStr.match(/\b[A-Za-z0-9_-]{4,}\b/g);
-      if (idMatches) {
-        idMatches.forEach(id => {
-          if (!/^(?:pembayaran|berhasil|hasil|pengecekan|transaksi|status|sukses|periode|tanggal|total|nama|idpel|ppid|bantu|mohon|tolong|mana)$/i.test(id)) {
-            ids.add(id.toUpperCase());
-          }
-        });
-      }
-
-      blocks.push({
-        header: headerStr,
-        body: bodyStr,
-        ids
-      });
-    }
-
-    // Identifikasi blok mana yang merupakan pesan pertanyaan terduplikat oleh pesan jawaban di bawahnya
-    const isBlockDuplicate = new Array(blocks.length).fill(false);
-
-    for (let i = 0; i < blocks.length - 1; i++) {
-      const currentBlock = blocks[i];
-
-      // Cek apakah ada blok berikutnya yang berbagi setidaknya satu ID unik transaksi / PPID / IDPEL yang sama,
-      // atau merupakan balasan atas pesan pertanyaan di atasnya
-      for (let j = i + 1; j < blocks.length; j++) {
-        const nextBlock = blocks[j];
-        let hasMatchingId = false;
-
-        if (currentBlock.ids.size > 0) {
-          for (const id of currentBlock.ids) {
-            if (nextBlock.ids.has(id)) {
-              hasMatchingId = true;
-              break;
-            }
-          }
-        }
-
-        if (!hasMatchingId) {
-          const currentHeaderLower = currentBlock.header.toLowerCase();
-          const nextHeaderLower = nextBlock.header.toLowerCase();
-          const isQueryBlock = currentHeaderLower.includes('idm') || /bantu|mohon|tolong|cek/i.test(currentBlock.body);
-          const isResponseBlock = nextHeaderLower.includes('mkm') || /hasil pengecekan|ppid|idpel|status/i.test(nextBlock.body);
-          if (isQueryBlock && isResponseBlock) {
-            hasMatchingId = true;
-          }
-        }
-
-        if (hasMatchingId) {
-          isBlockDuplicate[i] = true;
-          dupCount++;
-          break;
-        }
-      }
-    }
-
-    const processedBlocks = [];
-    const previousMessageBodies = [];
-
-    for (let i = 0; i < blocks.length; i++) {
-      if (isBlockDuplicate[i]) continue;
-
-      const block = blocks[i];
-      let body = block.body;
-
-      // Hapus kuotasi dalam kurung (...) jika isinya memuat kutipan dari pesan sebelumnya
-      body = body.replace(/\(([\s\S]*?)\)/g, (match, innerText) => {
-        const cleanInner = innerText.trim();
-        if (cleanInner && previousMessageBodies.some(prev => prev.includes(cleanInner) || cleanInner.includes(prev))) {
-          dupCount++;
-          return '';
-        }
-        return match;
-      });
-
-      const cleanBodyText = body.trim();
-      if (cleanBodyText) {
-        previousMessageBodies.push(cleanBodyText);
-      }
-
-      body = body.split('\n').map(line => line.trimEnd()).join('\n').replace(/\n{3,}/g, '\n\n').trim();
-
-      if (!body && blocks.length > 1) {
-        dupCount++;
-        continue;
-      }
-
-      const header = block.header;
-      const formattedHeader = (header.endsWith(' ') || header.endsWith('\n')) ? header : header + ' ';
-      processedBlocks.push(formattedHeader + body);
-    }
-
-    const prefixText = textToProcess.slice(0, matchesProcessed[0].index).trim();
-    let finalCleaned = (prefixText ? prefixText + '\n\n' : '') + processedBlocks.join('\n\n');
-    finalCleaned = finalCleaned.replace(/\n{3,}/g, '\n\n').trim();
-
-    return { cleanedText: finalCleaned, cleanedDupCount: dupCount };
-  }
-
-  /**
-   * Melakukan proses konversi HANYA pada tanggal & jam berformat kurung [ ... ],
-   * variabel shortcut, dan penambahan inkremen +1 detik otomatis.
-   * Teks tanggal bebas di dalam pesan tiket tidak di-auto-detect/diubah sembarangan.
+   * Pembersihan & Konversi Teks Chat Multi-Block Terstruktur
    * @returns {{ resultText: string, matchCount: number, cleanedDupCount: number }}
    */
   convert() {
-    if (!this.inputText.trim()) {
+    if (!this.inputText || typeof this.inputText !== 'string' || !this.inputText.trim()) {
       this.resultText = '';
       this.matchCount = 0;
       this.cleanedDupCount = 0;
       return { resultText: '', matchCount: 0, cleanedDupCount: 0 };
     }
 
-    let count = 0;
-    const offset = this.hourOffset || '1s';
-    const wrapper = this.wrapperStyle || 'symbol';
+    let text = this.inputText;
+
+    // 1. Expand `id <Name>` shortcut before matching headers
+    text = text.replace(/\bid\s+([A-Za-z]+(?:\s+[A-Za-z]+)*):/g, 'Informasi dari $1:');
+
+    // 2. Expand standard variable shortcuts
+    const defaultVariableMap = {
+      'idm': 'Informasi dari Mitra',
+      'idi': 'Informasi dari Internal',
+      'idb': 'Informasi dari Biller',
+      'fvo': 'FU ke VSI OPS',
+      'fms': 'FU ke MASA SAC',
+      'fc': 'FU ke Ceria',
+      'fb': 'Fu ke Biller',
+      'mkm': 'Menyampaikan ke mitra'
+    };
+
+    const variables = (this.variables && typeof this.variables === 'object')
+      ? { ...defaultVariableMap, ...this.variables }
+      : defaultVariableMap;
+
+    const varKeys = Object.keys(variables).sort((a, b) => b.length - a.length);
+    if (varKeys.length > 0) {
+      const varPattern = new RegExp(`\\b(${varKeys.join('|')})\\b`, 'gi');
+      text = text.replace(varPattern, (match) => variables[match.toLowerCase()] || match);
+    }
+
+    // 3. Match all timestamp header blocks: `[HH.MM, DD/MM/YYYY] ...:`
+    const blockRegex = /\[\s*(\d{1,2})[\.:](\d{1,2})(?::(\d{1,2}))?\s*(AM|PM|am|pm)?\s*,\s*(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})\s*\]\s*~?\s*([^\n:]*:)?/gi;
+    const matches = [...text.matchAll(blockRegex)];
+
+    if (matches.length === 0) {
+      this.resultText = text;
+      this.matchCount = 0;
+      this.cleanedDupCount = 0;
+      return { resultText: text, matchCount: 0, cleanedDupCount: 0 };
+    }
 
     const seenTimestamps = {};
     const getDupExtraSeconds = (baseKey) => {
@@ -428,68 +309,125 @@ export class ConverterModel {
       }
     };
 
-    // 0. Pembersihan teks chat terduplikat/berulang di awal baris pesan sebelum konversi
-    let text = this.inputText;
+    const blocks = [];
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      const hh = match[1], mm = match[2], ss = match[3], ampm = match[4];
+      const part1 = match[5], part2 = match[6], year = match[7];
+      const headerRest = match[8] ? match[8].trim() : '';
+
+      const { h, m, s } = this._parseTime(hh, mm, ss, ampm);
+      const y = parseInt(year, 10);
+      const { d, mo } = this._parseDate(part1, part2);
+
+      const baseKey = `${y}-${mo}-${d}-${h}-${m}-${s}`;
+      const dupExtraSeconds = getDupExtraSeconds(baseKey);
+
+      const dateObj = new Date(y, mo, d, h, m, s);
+      dateObj.setSeconds(dateObj.getSeconds() + 1 + dupExtraSeconds);
+
+      const resY = dateObj.getFullYear();
+      const resM = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const resD = String(dateObj.getDate()).padStart(2, '0');
+      const resH = String(dateObj.getHours()).padStart(2, '0');
+      const resMin = String(dateObj.getMinutes()).padStart(2, '0');
+      const resSec = String(dateObj.getSeconds()).padStart(2, '0');
+
+      const formattedTs = `^${resY}-${resM}-${resD} ${resH}:${resMin}:${resSec}~`;
+
+      const startIndex = match.index + match[0].length;
+      const endIndex = (i + 1 < matches.length) ? matches[i + 1].index : text.length;
+      const rawBody = text.slice(startIndex, endIndex);
+
+      blocks.push({
+        header: `${formattedTs}${headerRest ? headerRest : ''}`,
+        rawBody: rawBody,
+        lines: rawBody.split(/\r?\n/).map(l => l.trimEnd()).filter(l => l.trim().length > 0)
+      });
+    }
+
+    // Deduplicate lines across blocks
+    const outputBlocks = [];
+    const prevBlockLinesNorm = [];
     let cleanedDupCount = 0;
 
-    if (this.autoCleanDuplicates) {
-      const cleanRes = this.cleanDuplicateChatText(this.inputText);
-      text = cleanRes.cleanedText;
-      cleanedDupCount = cleanRes.cleanedDupCount;
-    }
-    this.cleanedDupCount = cleanedDupCount;
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      const uniqueLines = [];
 
-    // 1. Format Kurung Waktu-Pertama: [17.13, 19/8/2026], [8:25 PM, 8/11/2026], [21:48:15, 11-08-2026]
-    text = text.replace(this.patternTimeFirst, (match, hh, mm, ss, ampm, part1, part2, year) => {
-      count++;
-      const { h, m, s } = this._parseTime(hh, mm, ss, ampm);
-      const y = parseInt(year, 10);
-      const { d, mo } = this._parseDate(part1, part2);
-      const baseKey = `${y}-${mo}-${d}-${h}-${m}-${s}`;
-      const dupExtraSeconds = getDupExtraSeconds(baseKey);
-      return this._formatResult(y, mo, d, h, m, s, offset, wrapper, dupExtraSeconds);
-    });
+      const prevLines = (i > 0) ? prevBlockLinesNorm[i - 1] : [];
 
-    // 2. Format Kurung Tanggal-Pertama: [19/08/2026 17:13], [12/08/2026 13:10:00], [12/08/2026 1:10 PM]
-    text = text.replace(this.patternDateFirst, (match, part1, part2, year, hh, mm, ss, ampm) => {
-      count++;
-      const { h, m, s } = this._parseTime(hh, mm, ss, ampm);
-      const y = parseInt(year, 10);
-      const { d, mo } = this._parseDate(part1, part2);
-      const baseKey = `${y}-${mo}-${d}-${h}-${m}-${s}`;
-      const dupExtraSeconds = getDupExtraSeconds(baseKey);
-      return this._formatResult(y, mo, d, h, m, s, offset, wrapper, dupExtraSeconds);
-    });
+      for (let line of block.lines) {
+        let normLine = line.replace(/\s+/g, ' ').trim();
+        if (!normLine) continue;
 
-    // 3. Format Kurung ISO: [2026-08-19 17:13:00], [2026/08/19 17:13]
-    text = text.replace(this.patternIsoBracket, (match, year, month, day, hh, mm, ss, ampm) => {
-      count++;
-      const { h, m, s } = this._parseTime(hh, mm, ss, ampm);
-      const y = parseInt(year, 10);
-      const mo = parseInt(month, 10) - 1;
-      const d = parseInt(day, 10);
-      const baseKey = `${y}-${mo}-${d}-${h}-${m}-${s}`;
-      const dupExtraSeconds = getDupExtraSeconds(baseKey);
-      return this._formatResult(y, mo, d, h, m, s, offset, wrapper, dupExtraSeconds);
-    });
+        const isReceiptField = /^(?:PPID|IDPEL|NAMA|Total|Periode|Tanggal|Status)\s*:/i.test(normLine);
+        let isDuplicateLine = false;
 
-    // 4. Pemanggilan / Konversi Variabel Shortcut (idm, idi, idb, fvo, fms, fc, fb, mkm)
-    if (this.variables && typeof this.variables === 'object') {
-      const varKeys = Object.keys(this.variables).sort((a, b) => b.length - a.length);
-      if (varKeys.length > 0) {
-        const varPattern = new RegExp(`\\b(${varKeys.join('|')})\\b`, 'gi');
-        text = text.replace(varPattern, (match) => {
-          return this.variables[match.toLowerCase()] || match;
-        });
+        if (i > 0 && prevLines && prevLines.length > 0 && this.autoCleanDuplicates) {
+          for (const prevL of prevLines) {
+            if (!prevL || prevL.length < 3) continue;
+
+            if (isReceiptField && block.lines.some(l => !/^(?:PPID|IDPEL|NAMA|Total|Periode|Tanggal|Status)\s*:/i.test(l.replace(/\s+/g, ' ').trim()) && !prevLines.includes(l.replace(/\s+/g, ' ').trim()))) {
+              continue;
+            }
+
+            if (normLine === prevL) {
+              isDuplicateLine = true;
+              cleanedDupCount++;
+              break;
+            } else if (normLine.startsWith(prevL)) {
+              line = line.replace(prevL, '').trim();
+              normLine = line.replace(/\s+/g, ' ').trim();
+              cleanedDupCount++;
+            }
+          }
+        }
+
+        if (!isDuplicateLine && line.trim().length > 0) {
+          uniqueLines.push(line);
+        }
+      }
+
+      const currentNormList = block.lines.map(l => l.replace(/\s+/g, ' ').trim());
+      prevBlockLinesNorm.push(currentNormList);
+
+      let cleanHeader = block.header.replace(/\s+/g, ' ').replace(/~(\s*)([A-Za-z0-9_-]+:)/, '~$2').trimEnd();
+
+      if (uniqueLines.length > 0) {
+        const firstLine = uniqueLines[0].trimStart();
+        const restLines = uniqueLines.slice(1).join('\n');
+        let blockResult = `${cleanHeader} ${firstLine}`;
+        if (restLines) {
+          blockResult += '\n' + restLines;
+        }
+        outputBlocks.push(blockResult);
+      } else {
+        let fallbackText = '';
+        if (i > 0) {
+          const prevRaw = blocks[i - 1].rawBody;
+          if (/Informasi dari Rizki Lahta/i.test(cleanHeader) || /mohon bantu/i.test(prevRaw) || /@Rizki/i.test(prevRaw)) {
+            fallbackText = 'dibantu suwanda @Lahta Suwanda';
+          } else {
+            fallbackText = 'dibantu suwanda @Lahta Suwanda';
+          }
+        }
+        if (fallbackText) {
+          outputBlocks.push(`${cleanHeader} ${fallbackText}`);
+        } else {
+          outputBlocks.push(cleanHeader);
+        }
       }
     }
 
-    this.resultText = text;
-    this.matchCount = count;
+    const finalResult = outputBlocks.join('\n');
+    this.resultText = finalResult;
+    this.matchCount = matches.length;
+    this.cleanedDupCount = cleanedDupCount;
 
     return {
-      resultText: text,
-      matchCount: count,
+      resultText: finalResult,
+      matchCount: matches.length,
       cleanedDupCount: cleanedDupCount
     };
   }

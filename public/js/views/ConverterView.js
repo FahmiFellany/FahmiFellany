@@ -142,31 +142,10 @@ export class ConverterView {
    * @param {Array<{ key: string, label: string, reason: string }>} suggestions 
    * @param {Function} onSelect 
    */
-  renderSmartSuggestions(suggestions = [], onSelect = null) {
-    if (!this.smartSuggestionsPanel || !this.smartSuggestionsChips) return;
-
-    if (!suggestions || suggestions.length === 0) {
-      this.hideSmartSuggestions();
-      return;
+  renderSmartSuggestions(suggestions, onSelect) {
+    if (this.smartSuggestionsPanel) {
+      this.smartSuggestionsPanel.style.display = 'none';
     }
-
-    this.smartSuggestionsChips.innerHTML = '';
-    suggestions.forEach(item => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'smart-action-chip';
-      chip.title = `${item.reason} -> Terapkan ${item.key}: ${item.label}`;
-      chip.innerHTML = `
-        <span class="smart-chip-sparkle">✨</span>
-        <span class="smart-chip-label">Terapkan Template: <strong>${this._escapeHtml(item.key)}</strong> (${this._escapeHtml(item.label)})</span>
-      `;
-      chip.addEventListener('click', () => {
-        if (onSelect) onSelect(item.key);
-      });
-      this.smartSuggestionsChips.appendChild(chip);
-    });
-
-    this.smartSuggestionsPanel.style.display = 'block';
   }
 
   hideSmartSuggestions() {
@@ -182,23 +161,9 @@ export class ConverterView {
    * @param {Function} onSwitch 
    */
   showCrossMenuBanner(info, onSwitch) {
-    if (!this.crossMenuBanner || !info) return;
-
-    if (this.crossMenuTitle) this.crossMenuTitle.textContent = info.title;
-    if (this.crossMenuDesc) this.crossMenuDesc.textContent = info.description;
-
-    if (this.btnCrossMenuSwitch) {
-      const newBtn = this.btnCrossMenuSwitch.cloneNode(true);
-      this.btnCrossMenuSwitch.parentNode.replaceChild(newBtn, this.btnCrossMenuSwitch);
-      this.btnCrossMenuSwitch = newBtn;
-
-      this.btnCrossMenuSwitch.addEventListener('click', () => {
-        this.hideCrossMenuBanner();
-        if (onSwitch) onSwitch(info.targetTab);
-      });
+    if (this.crossMenuBanner) {
+      this.crossMenuBanner.style.display = 'none';
     }
-
-    this.crossMenuBanner.style.display = 'flex';
   }
 
   hideCrossMenuBanner() {
