@@ -2,6 +2,9 @@
 .env
 .env.*
 !.env.example
+service_account.json
+*.pem
+*.key
 
 # Data Storage (JSON Runtime)
 data/*.json

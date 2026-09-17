@@ -1,4 +1,5 @@
 import { ComponentLoader } from './utils/ComponentLoader.js';
+import { TabManager } from './utils/TabManager.js';
 
 import { ConverterModel } from './models/ConverterModel.js';
 import { ConverterView } from './views/ConverterView.js';
@@ -20,12 +21,17 @@ import { CidEksModel } from './models/CidEksModel.js';
 import { CidEksView } from './views/CidEksView.js';
 import { CidEksController } from './controllers/CidEksController.js';
 
+import { MbsbModel } from './models/MbsbModel.js';
+import { MbsbView } from './views/MbsbView.js';
+import { MbsbController } from './controllers/MbsbController.js';
+
 /**
  * Main Application Bootstrap (OOP MVC Modular)
  */
 document.addEventListener('DOMContentLoaded', async () => {
   // 0. Memuat seluruh komponen HTML partials terpisah secara dinamis
   await ComponentLoader.loadAll();
+  TabManager.init();
 
   // 1. Inisialisasi Converter Component
   const converterModel = new ConverterModel();
@@ -60,10 +66,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const cidEksView = new CidEksView();
   const cidEksController = new CidEksController(cidEksModel, cidEksView);
 
-  // 6. Hubungkan Controller Lintas Menu (Cross-Menu Navigation)
+  // 6. Inisialisasi MBSB Helpdesk Monitoring Component
+  const mbsbModel = new MbsbModel();
+  const mbsbView = new MbsbView();
+  const mbsbController = new MbsbController(mbsbModel, mbsbView);
+
+  // 7. Hubungkan Controller Lintas Menu (Cross-Menu Navigation)
   converterController.setCrossMenuControllers({
     ocrController,
     saldoController,
-    cidEksController
+    cidEksController,
+    mbsbController
   });
 });

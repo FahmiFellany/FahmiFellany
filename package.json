@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "dotenv": "^17.4.2",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "google-auth-library": "^11.0.2",
+    "googleapis": "^181.0.0"
   }
 }

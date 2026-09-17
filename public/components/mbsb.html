@@ -1,0 +1,211 @@
+<!-- VIEW 6: MBSB MONITORING HELPDESK (PIC) -->
+<div id="viewMbsb" class="view-container" style="display: none;">
+  <!-- Header Menu MBSB -->
+  <div class="mbsb-header"
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); padding: 1.25rem 1.5rem; border-radius: 12px; backdrop-filter: blur(8px);">
+    <div class="mbsb-header-title">
+      <h2
+        style="font-size: 1.35rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.6rem;">
+        <span
+          style="background: linear-gradient(135deg, #06b6d4, #3b82f6); padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.9rem; font-weight: 700; color: #ffffff;">MBSB</span>
+        Form Monitoring App MBSB (Helpdesk PIC)
+      </h2>
+      <p class="section-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;">
+        Input data checklist monitoring performa & gangguan modul aplikasi MBSB. Peran pengguna: <strong>Helpdesk
+          (PIC)</strong>.
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="button" id="mbsbBtnReset" class="btn-chip"
+        style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #e2e8f0; font-size: 0.82rem; padding: 0.5rem 0.9rem; border-radius: 8px; cursor: pointer;">
+        🔄 Reset Form
+      </button>
+    </div>
+  </div>
+
+  <!-- Form Input Grid Utama -->
+  <div class="mbsb-form-card"
+    style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
+
+    <!-- Banner Status Validasi Keterangan -->
+    <div id="mbsbValidationBanner"
+      style="display: none; margin-bottom: 1.25rem; padding: 0.85rem 1.1rem; border-radius: 10px; font-size: 0.88rem; font-weight: 500; transition: all 0.3s ease;">
+    </div>
+
+    <form id="mbsbForm" onsubmit="return false;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+
+        <!-- 1. Checking Date -->
+        <div class="form-group">
+          <label for="mbsbCheckingDate"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;">
+            1. Checking Date <span style="font-size: 0.75rem; color: #64748b; font-weight: 400;">(Otomatis hari
+              ini)</span>
+          </label>
+          <input type="text" id="mbsbCheckingDate" class="cid-input" readonly
+            style="width: 100%; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: not-allowed;" />
+        </div>
+
+        <!-- 2. Checking Time -->
+        <div class="form-group">
+          <label for="mbsbCheckingTime"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;">
+            2. Checking Time <span style="color: #ef4444;">*</span>
+          </label>
+          <select id="mbsbCheckingTime" class="cid-select"
+            style="width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+            <option value="">-- Pilih Waktu Checking --</option>
+            <option value="08:00 WIB">08:00 WIB</option>
+            <option value="13:00 WIB">13:00 WIB</option>
+            <option value="16:00 WIB">16:00 WIB</option>
+          </select>
+        </div>
+
+        <!-- 3. Login -->
+        <div class="form-group">
+          <label for="mbsbLogin"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;">
+            3. Login <span style="color: #ef4444;">*</span>
+          </label>
+          <select id="mbsbLogin" class="mbsb-module-select cid-select"
+            style="width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+            <option value="">-- Pilih Status Login --</option>
+            <option value="3 Detik">3 Detik</option>
+            <option value="4 Detik">4 Detik</option>
+            <option value="5 Detik">5 Detik</option>
+            <option value="6-10 detik">6-10 detik</option>
+            <option value="Gangguan">Gangguan</option>
+          </select>
+        </div>
+
+        <!-- 4. Check Balance -->
+        <div class="form-group">
+          <label for="mbsbCheckBalance"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;">
+            4. Check Balance <span style="color: #ef4444;">*</span>
+          </label>
+          <select id="mbsbCheckBalance" class="mbsb-module-select cid-select"
+            style="width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+            <option value="">-- Pilih Status Check Balance --</option>
+            <option value="3 Detik">3 Detik</option>
+            <option value="4 Detik">4 Detik</option>
+            <option value="5 Detik">5 Detik</option>
+            <option value="6-10 detik">6-10 detik</option>
+            <option value="Gangguan">Gangguan</option>
+          </select>
+        </div>
+
+        <!-- 5. Transfer Dana -->
+        <div class="form-group" style="grid-column: span 1;">
+          <label for="mbsbTransferDana"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;"
+            title="Transfer Dana (Sesama BSB) over booking, antar Bank , Transfer Online sama Transfer SKN">
+            5. Transfer Dana <span style="font-size: 0.73rem; color: #94a3b8; font-weight: 400;">(Sesama BSB/Antar
+              Bank/Online/SKN)</span> <span style="color: #ef4444;">*</span>
+          </label>
+          <select id="mbsbTransferDana" class="mbsb-module-select cid-select"
+            style="width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+            <option value="">-- Pilih Status Transfer Dana --</option>
+            <option value="3 Detik">3 Detik</option>
+            <option value="4 Detik">4 Detik</option>
+            <option value="5 Detik">5 Detik</option>
+            <option value="6-10 detik">6-10 detik</option>
+            <option value="Gangguan">Gangguan</option>
+          </select>
+        </div>
+
+        <!-- 6. Fitur Pembayaran -->
+        <div class="form-group">
+          <label for="mbsbFiturPembayaran"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;">
+            6. Fitur Pembayaran <span style="font-size: 0.73rem; color: #94a3b8; font-weight: 400;">(Random)</span>
+            <span style="color: #ef4444;">*</span>
+          </label>
+          <select id="mbsbFiturPembayaran" class="mbsb-module-select cid-select"
+            style="width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+            <option value="">-- Pilih Status Fitur Pembayaran --</option>
+            <option value="3 Detik">3 Detik</option>
+            <option value="4 Detik">4 Detik</option>
+            <option value="5 Detik">5 Detik</option>
+            <option value="6-10 detik">6-10 detik</option>
+            <option value="Gangguan">Gangguan</option>
+          </select>
+        </div>
+
+        <!-- 7. Provider/Jaringan -->
+        <div class="form-group">
+          <label for="mbsbProviderJaringan"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;">
+            7. Provider/Jaringan <span style="font-size: 0.75rem; color: #64748b; font-weight: 400;">(Default
+              Read-only)</span>
+          </label>
+          <input type="text" id="mbsbProviderJaringan" value="WIFI KANTOR" readonly
+            style="width: 100%; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #cbd5e1; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: not-allowed; font-weight: 600;" />
+        </div>
+
+        <!-- 8. PIC -->
+        <div class="form-group">
+          <label for="mbsbPic"
+            style="display: block; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem;">
+            8. PIC <span style="font-size: 0.73rem; color: #94a3b8; font-weight: 400;">(Helpdesk)</span> <span
+              style="color: #ef4444;">*</span>
+          </label>
+          <select id="mbsbPic" class="cid-select"
+            style="width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.65rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+            <option value="">-- Pilih PIC Helpdesk --</option>
+            <option value="Fahmi">Fahmi</option>
+            <option value="Abed">Abed</option>
+            <option value="Bio">Bio</option>
+            <option value="Wicak">Wicak</option>
+            <option value="Anjas">Anjas</option>
+            <option value="Rangga">Rangga</option>
+            <option value="Mugni">Mugni</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- 9. Keterangan (Tek/Paragraph) -->
+      <div class="form-group" style="margin-top: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <label for="mbsbKeterangan" style="font-size: 0.85rem; font-weight: 600; color: #38bdf8;">
+            9. Keterangan
+            <span id="mbsbKeteranganRequirementBadge"
+              style="font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 4px; margin-left: 0.4rem; font-weight: 600; background: rgba(148, 163, 184, 0.2); color: #94a3b8;">
+              Opsional
+            </span>
+          </label>
+        </div>
+        <textarea id="mbsbKeterangan" rows="3"
+          placeholder="Tuliskan detail keterangan atau catatan kendala jika modul berstatus Gangguan..."
+          style="width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; padding: 0.75rem 0.9rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; resize: vertical; box-sizing: border-box;"></textarea>
+      </div>
+
+      <!-- Section Integrasi Google Sheets (Terproteksi Backend Server .env) -->
+      <input type="hidden" id="mbsbSpreadsheetId" value="" />
+      <div
+        style="margin-top: 1.25rem; padding: 0.85rem 1.1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.1rem;">🔒</span>
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: #34d399;">Database Google Sheets Terhubung &
+              Terproteksi</div>
+            <!-- <div style="font-size: 0.75rem; color: #94a3b8;">Tujuan dikelola aman oleh Server Backend (.env) • Service Account: <code style="color: #38bdf8;">sheets-mbsb@mbsb-508804.iam.gserviceaccount.com</code></div> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap;">
+        <button type="button" id="mbsbBtnSendGsheet" class="btn-chip"
+          style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+          📊 Kirim ke Google Sheets (Node.js)
+        </button>
+        <button type="button" id="mbsbBtnCopyFormatted" class="btn-chip"
+          style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 0.75rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+          📋 Salin Format Chat / Tabular
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

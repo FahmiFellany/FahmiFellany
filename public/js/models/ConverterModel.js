@@ -19,6 +19,7 @@ export class ConverterModel {
       'idi': 'Informasi dari Internal',
       'idb': 'Informasi dari Biller',
       'fvo': 'FU ke VSI OPS',
+      'fv': 'FU VTAX OPS',
       'fms': 'FU ke MASA SAC',
       'fc': 'FU ke Ceria',
       'fb': 'Fu ke Biller',
@@ -263,7 +264,7 @@ export class ConverterModel {
     let text = this.inputText;
 
     // 1. Expand `id <Name>` shortcut before matching headers
-    text = text.replace(/\bid\s+([A-Za-z]+(?:\s+[A-Za-z]+)*):/g, 'Informasi dari $1:');
+    text = text.replace(/\bid\s+([A-Za-z0-9_\-]+(?:\s+[A-Za-z0-9_\-]+)*):/g, 'Informasi dari $1:');
 
     // 2. Expand standard variable shortcuts
     const defaultVariableMap = {
@@ -271,6 +272,7 @@ export class ConverterModel {
       'idi': 'Informasi dari Internal',
       'idb': 'Informasi dari Biller',
       'fvo': 'FU ke VSI OPS',
+      'fv': 'FU VTAX OPS',
       'fms': 'FU ke MASA SAC',
       'fc': 'FU ke Ceria',
       'fb': 'Fu ke Biller',
@@ -346,6 +348,22 @@ export class ConverterModel {
       });
     }
 
+    const processLine = (line) => {
+      if (/SystemException|id\.co\.vsi/i.test(line)) {
+        line = line.replace(/\bid\.co\.vsi/gi, 'Informasi dari.co.vsi');
+        if (/^\s*\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(line)) {
+          line = ' ' + line.trim();
+        }
+      }
+      return line;
+    };
+
+    const isTxField = (l) => {
+      const norm = l.replace(/\s+/g, ' ').trim();
+      return /^(?:NOP|Tahun Pajak|Kendala|Transaksi via|PAYMENT|PPID|IDPEL|NAMA|Total|Periode|Tanggal|Status|Jenis Transaksi|Transaksi PBB)\s*[\:\-]/i.test(norm) ||
+             /^(?:NOP|Tahun Pajak|Kendala|Transaksi via|PAYMENT)\b/i.test(norm);
+    };
+
     // Deduplicate lines across blocks
     const outputBlocks = [];
     const prevBlockLinesNorm = [];
@@ -357,35 +375,29 @@ export class ConverterModel {
 
       const prevLines = (i > 0) ? prevBlockLinesNorm[i - 1] : [];
 
+      const hasNewTxField = (i > 0 && prevLines.length > 0) ? block.lines.some(l => {
+        const norm = l.replace(/\s+/g, ' ').trim();
+        return isTxField(norm) && !prevLines.includes(norm);
+      }) : false;
+
       for (let line of block.lines) {
-        let normLine = line.replace(/\s+/g, ' ').trim();
+        let cleanL = processLine(line);
+        let normLine = cleanL.replace(/\s+/g, ' ').trim();
         if (!normLine) continue;
 
-        const isReceiptField = /^(?:PPID|IDPEL|NAMA|Total|Periode|Tanggal|Status)\s*:/i.test(normLine);
         let isDuplicateLine = false;
 
         if (i > 0 && prevLines && prevLines.length > 0 && this.autoCleanDuplicates) {
-          for (const prevL of prevLines) {
-            if (!prevL || prevL.length < 3) continue;
-
-            if (isReceiptField && block.lines.some(l => !/^(?:PPID|IDPEL|NAMA|Total|Periode|Tanggal|Status)\s*:/i.test(l.replace(/\s+/g, ' ').trim()) && !prevLines.includes(l.replace(/\s+/g, ' ').trim()))) {
-              continue;
-            }
-
-            if (normLine === prevL) {
+          if (!hasNewTxField) {
+            if (prevLines.includes(normLine)) {
               isDuplicateLine = true;
-              cleanedDupCount++;
-              break;
-            } else if (normLine.startsWith(prevL)) {
-              line = line.replace(prevL, '').trim();
-              normLine = line.replace(/\s+/g, ' ').trim();
               cleanedDupCount++;
             }
           }
         }
 
-        if (!isDuplicateLine && line.trim().length > 0) {
-          uniqueLines.push(line);
+        if (!isDuplicateLine) {
+          uniqueLines.push(cleanL);
         }
       }
 

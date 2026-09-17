@@ -13,6 +13,7 @@ export class ComponentLoader {
       { id: 'viewOcrContainer', path: 'components/ocr.html' },
       { id: 'viewSaldoContainer', path: 'components/saldo.html' },
       { id: 'viewCidEksContainer', path: 'components/cid-eks.html' },
+      { id: 'viewMbsbContainer', path: 'components/mbsb.html' },
       { id: 'variableCrudModalContainer', path: 'components/modals/variable-crud.html' },
       { id: 'saldoCrudModalContainer', path: 'components/modals/saldo-crud.html' }
     ];

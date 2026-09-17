@@ -74,6 +74,88 @@ class ServerApp {
     this.app.use('/webhook/gitlab', this.gitlabWebhookRoutes.getRouter());
     this.app.use('/api/gitlab', this.gitlabWebhookRoutes.getRouter());
 
+    // Endpoint Direct Node.js Google Sheets Sender untuk Form MBSB
+    const googleSheetService = require('./src/services/googleSheetService');
+    
+    // Rate Limiter Memory Store (Proteksi Anti-Spam & DoS Request)
+    const rateLimitMap = new Map();
+    const rateLimiterMiddleware = (req, res, next) => {
+      const clientIp = req.ip || req.connection.remoteAddress || '127.0.0.1';
+      const now = Date.now();
+      const windowMs = 60 * 1000; // Window 1 menit
+      const maxRequests = 15; // Maksimal 15 request per menit
+
+      const clientData = rateLimitMap.get(clientIp) || { count: 0, resetTime: now + windowMs };
+
+      if (now > clientData.resetTime) {
+        clientData.count = 1;
+        clientData.resetTime = now + windowMs;
+      } else {
+        clientData.count++;
+      }
+
+      rateLimitMap.set(clientIp, clientData);
+
+      if (clientData.count > maxRequests) {
+        return res.status(429).json({
+          success: false,
+          error: '⚠️ Terlalu banyak request! Silakan tunggu 1 menit sebelum mengirim ulang.'
+        });
+      }
+      next();
+    };
+
+    // Helper Sanitasi Teks (Anti-XSS & Input Cleaning)
+    const sanitizeText = (str) => {
+      if (typeof str !== 'string') return '';
+      return str
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Strip script tags
+        .replace(/<[^>]+>/g, '') // Strip all HTML tags
+        .trim();
+    };
+
+    // GET Config Spreadsheet ID dari .env (Aman)
+    this.app.get('/api/mbsb/config', (req, res) => {
+      const spreadsheetId = process.env.MBSB_SPREADSHEET_ID || '';
+      return res.json({ success: true, spreadsheetId });
+    });
+
+    // POST Update/Append ke Google Sheets (dengan Proteksi Rate Limiting & Input Sanitization)
+    this.app.post('/api/mbsb/send-gsheet', rateLimiterMiddleware, async (req, res) => {
+      try {
+        let { spreadsheetId, data } = req.body || {};
+        if (!spreadsheetId || spreadsheetId.trim() === '') {
+          spreadsheetId = process.env.MBSB_SPREADSHEET_ID;
+        }
+
+        if (!spreadsheetId) {
+          return res.status(400).json({ success: false, error: 'Spreadsheet ID tidak ditemukan di .env maupun request!' });
+        }
+
+        // Sanitasi seluruh field data sebelum diproses
+        const sanitizedData = {
+          checkingDate: sanitizeText(data.checkingDate),
+          checkingTime: sanitizeText(data.checkingTime),
+          login: sanitizeText(data.login),
+          checkBalance: sanitizeText(data.checkBalance),
+          transferDana: sanitizeText(data.transferDana),
+          fiturPembayaran: sanitizeText(data.fiturPembayaran),
+          providerJaringan: sanitizeText(data.providerJaringan) || 'WIFI KANTOR',
+          pic: sanitizeText(data.pic),
+          keterangan: sanitizeText(data.keterangan) || '-'
+        };
+
+        const result = await googleSheetService.updateOrAppendMbsb(spreadsheetId, sanitizedData);
+        const actionMsg = result.action === 'UPDATE' 
+          ? `Data jam ${sanitizedData.checkingTime || ''} berhasil DI-UPDATE pada baris ${result.rowIndex} Google Sheet!`
+          : `Data berhasil DITAMBAHKAN ke baris baru Google Sheet!`;
+        return res.json({ success: true, message: actionMsg, result });
+      } catch (err) {
+        console.error('Gagal mengirim ke Google Sheets:', err.message);
+        return res.status(500).json({ success: false, error: err.message });
+      }
+    });
+
     // API 404 Fallback - Selalu mengembalikan JSON
     this.app.use('/api/*', (req, res) => {
       res.status(404).json({
