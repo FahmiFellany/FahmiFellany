@@ -1,9 +1,8 @@
 const jsonDb = require('../config/JsonDatabase');
 
 const DEFAULT_SALDO_ITEMS_SIANG_SORE = [
-  { id: 'pln_jatel', label: 'Saldo PLN - JATEL :', description: 'PLN JATEL' },
   { id: 'bimasakti_pdam', label: 'Saldo Bimasakti - PDAM  :', description: 'Bimasakti PDAM' },
-  { id: 'teleanjar_pdam', label: 'Saldo Teleanjar - PDAM:', description: 'Teleanjar PDAM' },
+  { id: 'teleanjar_pdam', label: 'Saldo Teleanjar - PDAM :', description: 'Teleanjar PDAM' },
   { id: 'delima_bpjs', label: 'Saldo DELIMA - BPJS-Kes & PayTV :', description: 'DELIMA BPJS-Kes & PayTV' },
   { id: 'dji_fif', label: 'Saldo DJI - FIF :', description: 'DJI FIF' },
   { id: 'pluslink_mf', label: 'Saldo Pluslink - MF :', description: 'Pluslink MF' },
@@ -11,13 +10,14 @@ const DEFAULT_SALDO_ITEMS_SIANG_SORE = [
   { id: 'gsp', label: 'Saldo GSP :', description: 'GSP' },
   { id: 'ptpos_pdam', label: 'Saldo PT POS - PDAM :', description: 'PT POS PDAM' },
   { id: 'artajasa_mba', label: 'Saldo Artajasa - MBA :', description: 'Artajasa MBA' },
-  { id: 'artajasa_vsi', label: 'Saldo Artajasa - VSI :', description: 'Artajasa VSI' },
   { id: 'arindo_pdam', label: 'Saldo Arindo - PDAM :', description: 'Arindo PDAM' },
-  { id: 'dana_voucher', label: 'Saldo Dana - Voucher :', description: 'Dana Voucher' },
+  { id: 'ewallet_dana', label: 'Saldo Ewallet - Dana :', description: 'E-Wallet Dana' },
   { id: 'linkqu_transfer', label: 'Saldo LinkQU - Transfer Uang :', description: 'LinkQU Transfer Uang' },
-  { id: 'ovo', label: 'Saldo Ovo :', description: 'Ovo' },
+  { id: 'artajasa_vsi', label: 'Saldo Artajasa - VSI :', description: 'Artajasa VSI' },
+  { id: 'ewallet_ovo', label: 'Saldo Ewallet - Ovo :', description: 'E-Wallet Ovo' },
   { id: 'tokopedia_gopay', label: 'Saldo Tokopedia - Gopay :', description: 'Tokopedia Gopay' },
-  { id: 'ajn_pdam', label: 'Saldo AJN - PDAM :', description: 'AJN PDAM' }
+  { id: 'ajn_pdam', label: 'Saldo AJN - PDAM :', description: 'AJN PDAM' },
+  { id: 'pln_jatel', label: 'Saldo PLN - JATEL :', description: 'PLN JATEL' }
 ];
 
 const DEFAULT_SALDO_ITEMS_PAGI_MALAM = [
