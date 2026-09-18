@@ -59,6 +59,12 @@ export class OcrModel {
         { key: 'CSM_TM_TRANSACT_AMOUNT', labelName: 'Total', pattern: /(?:\[?CSM[_\s]*TM[_\s]*TRANSACT[_\s]*AMOUNT\]?|^Total)\s*[:=]\s*(.*)/i },
         { key: 'CSM_TM_BILL_MONTH_1', labelName: 'Bulan', pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*MONTH[_\s]*[1I|l]\]?|^Bulan)\s*[:=]\s*(.*)/i },
         { key: 'CSM_TM_BILL_YEAR_1', labelName: 'Tahun', pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*YEAR[_\s]*[1I|l]\]?|^Tahun)\s*[:=]\s*(.*)/i },
+        { key: 'CSM_TM_BILL_MONTH_2', labelName: 'Bulan', optional: true, pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*MONTH[_\s]*2\]?)\s*[:=]\s*(.*)/i },
+        { key: 'CSM_TM_BILL_YEAR_2', labelName: 'Tahun', optional: true, pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*YEAR[_\s]*2\]?)\s*[:=]\s*(.*)/i },
+        { key: 'CSM_TM_BILL_MONTH_3', labelName: 'Bulan', optional: true, pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*MONTH[_\s]*3\]?)\s*[:=]\s*(.*)/i },
+        { key: 'CSM_TM_BILL_YEAR_3', labelName: 'Tahun', optional: true, pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*YEAR[_\s]*3\]?)\s*[:=]\s*(.*)/i },
+        { key: 'CSM_TM_BILL_MONTH_4', labelName: 'Bulan', optional: true, pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*MONTH[_\s]*4\]?)\s*[:=]\s*(.*)/i },
+        { key: 'CSM_TM_BILL_YEAR_4', labelName: 'Tahun', optional: true, pattern: /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*YEAR[_\s]*4\]?)\s*[:=]\s*(.*)/i },
         { key: 'CSM_TM_PAID', labelName: 'Tanggal', pattern: /(?:\[?(?:C[PS]M[_\s]*(?:TRANS|TM))[_\s]*PAID\]?|^Tanggal)\s*[:=]\s*(.*)/i, fallbackPattern: /(?:\[?(?:C[PS]M[_\s]*(?:TRANS|TM))[_\s]*SAVED\]?|^Saved)\s*[:=]\s*(.*)/i },
         { key: 'CSM_TM_TRXID', labelName: 'TRX ID', pattern: /(?:\[?CSM[_\s]*TM[_\s]*TRXID\]?|^TRX\s*ID)\s*[:=]\s*(.*)/i },
         { key: 'CSM_TM_FLAG', labelName: 'Status', optional: true, pattern: /(?:\[?(?:CSM[_\s]*TM|CPM[_\s]*TRANS)[_\s]*FLAG\]?|^Status)\s*[:=]\s*(.*)/i }
@@ -202,9 +208,9 @@ export class OcrModel {
       return 'prepaid';
     }
 
-    // 5. POSTPAID (PLN Tagihan Listrik) (Kamus Unik: BILL_MONTH_1, BILL_YEAR_1)
+    // 5. POSTPAID (PLN Tagihan Listrik) (Kamus Unik: BILL_MONTH_1-4, BILL_YEAR_1-4)
     if (
-      /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*(?:MONTH|YEAR)[_\s]*[1I|l]\]?)/im.test(text)
+      /(?:\[?CSM[_\s]*TM[_\s]*B[I1l|]*LL[_\s]*(?:MONTH|YEAR)[_\s]*[1-4I|l]\]?)/im.test(text)
     ) {
       return 'postpaid';
     }
