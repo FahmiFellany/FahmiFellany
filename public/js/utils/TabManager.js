@@ -5,6 +5,17 @@
  */
 export class TabManager {
   static init() {
+    // Sembunyikan menu MBSB jika berjalan di domain GitHub Pages (github.io)
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const mbsbBtn = document.getElementById('navTabMbsb');
+    if (mbsbBtn) {
+      if (isGitHubPages) {
+        mbsbBtn.style.display = 'none';
+      } else {
+        mbsbBtn.style.display = 'flex';
+      }
+    }
+
     const tabs = [
       { tabId: 'navTabConverter', viewId: 'viewConverter', display: 'flex' },
       { tabId: 'navTabOcr', viewId: 'viewOcr', display: 'block' },
